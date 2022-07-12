@@ -1,0 +1,102 @@
+Configuration	Self_Balancing_Stick
+STM32CubeMX 	6.6.0
+Date	07/05/2022
+MCU	STM32F446RETx
+
+
+
+PERIPHERALS	MODES	FUNCTIONS	PINS
+ADC1	IN14	ADC1_IN14	PC4
+I2C2	I2C	I2C2_SCL	PB10
+I2C2	I2C	I2C2_SDA	PC12
+SYS	Serial Wire	SYS_JTCK-SWCLK	PA14
+SYS	Serial Wire	SYS_JTMS-SWDIO	PA13
+SYS	SysTick	SYS_VS_Systick	VP_SYS_VS_Systick
+TIM2	PWM Generation CH1	TIM2_CH1	PA0-WKUP
+TIM2	PWM Generation CH2	TIM2_CH2	PA1
+TIM3	Encoder Mode	TIM3_CH1	PA6
+TIM3	Encoder Mode	TIM3_CH2	PA7
+TIM4	Encoder Mode	TIM4_CH1	PB6
+TIM4	Encoder Mode	TIM4_CH2	PB7
+TIM10	Enable_Timer	TIM10_VS_ClockSourceINT	VP_TIM10_VS_ClockSourceINT
+TIM10	PWM Generation CH1	TIM10_CH1	PB8
+
+
+
+Pin Nb	PINs	FUNCTIONs	LABELs
+3	PC14-OSC32_IN	GPIO_Output	CW_CCW_X
+4	PC15-OSC32_OUT	GPIO_Output	CW_CCW_Y
+5	PH0-OSC_IN	GPIO_Output	BRAKE_XY
+14	PA0-WKUP	TIM2_CH1	PWM_DCM_X
+15	PA1	TIM2_CH2	PWM_DCM_Y
+22	PA6	TIM3_CH1	ENC_X_A
+23	PA7	TIM3_CH2	ENC_X_B
+24	PC4	ADC1_IN14	BAT_STATUS
+29	PB10	I2C2_SCL	IMU_SCL
+46	PA13	SYS_JTMS-SWDIO	
+49	PA14	SYS_JTCK-SWCLK	
+53	PC12	I2C2_SDA	IMU_SDA
+58	PB6	TIM4_CH1	ENC_Y_A
+59	PB7	TIM4_CH2	ENC_Y_B
+61	PB8	TIM10_CH1	BUZ_PWM
+PERIPHERALS	MODES	FUNCTIONS	PINS
+ADC1	IN14	ADC1_IN14	PC4
+I2C2	I2C	I2C2_SCL	PB10
+I2C2	I2C	I2C2_SDA	PC12
+SYS	Serial Wire	SYS_JTCK-SWCLK	PA14
+SYS	Serial Wire	SYS_JTMS-SWDIO	PA13
+SYS	SysTick	SYS_VS_Systick	VP_SYS_VS_Systick
+TIM2	PWM Generation CH1	TIM2_CH1	PA0-WKUP
+TIM2	PWM Generation CH2	TIM2_CH2	PA1
+TIM3	Encoder Mode	TIM3_CH1	PA6
+TIM3	Encoder Mode	TIM3_CH2	PA7
+TIM4	Encoder Mode	TIM4_CH1	PB6
+TIM4	Encoder Mode	TIM4_CH2	PB7
+TIM10	Enable_Timer	TIM10_VS_ClockSourceINT	VP_TIM10_VS_ClockSourceINT
+TIM10	PWM Generation CH1	TIM10_CH1	PB8
+
+
+
+Pin Nb	PINs	FUNCTIONs	LABELs
+3	PC14-OSC32_IN	GPIO_Output	CW_CCW_X
+4	PC15-OSC32_OUT	GPIO_Output	CW_CCW_Y
+5	PH0-OSC_IN	GPIO_Output	BRAKE_XY
+14	PA0-WKUP	TIM2_CH1	PWM_DCM_X
+15	PA1	TIM2_CH2	PWM_DCM_Y
+22	PA6	TIM3_CH1	ENC_X_A
+23	PA7	TIM3_CH2	ENC_X_B
+24	PC4	ADC1_IN14	BAT_STATUS
+29	PB10	I2C2_SCL	IMU_SCL
+46	PA13	SYS_JTMS-SWDIO	
+49	PA14	SYS_JTCK-SWCLK	
+53	PC12	I2C2_SDA	IMU_SDA
+58	PB6	TIM4_CH1	ENC_Y_A
+59	PB7	TIM4_CH2	ENC_Y_B
+61	PB8	TIM10_CH1	BUZ_PWM
+
+
+
+SOFTWARE PROJECT
+
+Project Settings : 
+Project Name : Self_Balancing_Stick
+Project Folder : C:\Users\Francesco_Valenza\STM32CubeIDE\workspace_1.9.0\Self_Balancing_Stick
+Toolchain / IDE : STM32CubeIDE
+Firmware Package Name and Version : STM32Cube FW_F4 V1.27.0
+
+
+Code Generation Settings : 
+STM32Cube MCU packages and embedded software packs : Copy only the necessary library files
+Generate peripheral initialization as a pair of '.c/.h' files per peripheral : No
+Backup previously generated files when re-generating : No
+Delete previously generated files when not re-generated : Yes
+Set all free pins as analog (to optimize the power consumption) : No
+
+
+Toolchains Settings : 
+Compiler Optimizations : 
+
+
+
+
+
