@@ -28,9 +28,10 @@ extern "C" {
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f4xx_hal.h"
-#include "stdint.h"
-#include "stdlib.h"
-#include "math.h"
+#include <string.h>
+#include <stdlib.h>
+#include <stdint.h>
+#include <math.h>
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -89,6 +90,14 @@ void Error_Handler(void);
 #define BUZ_PWM_Pin GPIO_PIN_8
 #define BUZ_PWM_GPIO_Port GPIOB
 /* USER CODE BEGIN Private defines */
+
+typedef char Error_t;
+#define E_OK 		(Error_t)0
+#define E_NOT_OK    (Error_t)1
+
+typedef char Bool_t;
+#define TRUE		(Bool_t)0
+#define FALSE		(Bool_t)1
 
 /* USER CODE END Private defines */
 

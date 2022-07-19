@@ -47,6 +47,8 @@
 									<listOptionValue builtIn="false" value="../Core/Components/I2C"/>
 									<listOptionValue builtIn="false" value="../Core/Components/MPU6050"/>
 									<listOptionValue builtIn="false" value="../Core/Components/CONTROLLER"/>
+									<listOptionValue builtIn="false" value="../Core/Components/ENCODER"/>
+									<listOptionValue builtIn="false" value="../Core/Components/MOTOR"/>
 									<listOptionValue builtIn="false" value="../Drivers/STM32F4xx_HAL_Driver/Inc"/>
 									<listOptionValue builtIn="false" value="../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy"/>
 									<listOptionValue builtIn="false" value="../Drivers/CMSIS/Device/ST/STM32F4xx/Include"/>
