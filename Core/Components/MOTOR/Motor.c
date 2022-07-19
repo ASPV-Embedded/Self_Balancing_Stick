@@ -7,60 +7,101 @@
 
 #include "MotorInt.h"
 
-void MotorInit (Motor_Handle_TypeDef *hdl){
-	/* Operazione singola valida per entrambi i motori, timer unico */
-	HAL_TIM_PWM_Stop(hdl->htim, hdl->TIM_CHANNEL);
-	hdl->htim->Instance->ARR = ARR_VALUE;
-	hdl->htim->Instance->PSC = PSC_VALUE;
+
+/*
+ * @brief Initialize Motor
+ * @param Pointer to Motor Handle structure
+ */
+void Motor_Init (Motor_Handle_t *MotorHandle)
+{
+	/* Operazione da effettuare per entrambi i motori, timer unico ma diversi canali */
+	HAL_TIM_PWM_Stop(MotorHandle->htim, MotorHandle->uint32_TimChannel);
+	MotorHandle->htim->Instance->ARR = ARR_VALUE;
+	MotorHandle->htim->Instance->PSC = PSC_VALUE;
 }
 
-Motor_Status_TypeDef set_DutyCycle(Motor_Handle_TypeDef *hdl, float duty_cycle) {
-	hdl->duty_cycle = abs(duty_cycle);
-	if (duty_cycle == 0) {
-		__HAL_TIM_SET_COMPARE(hdl->htim, TIM_CHANNEL_1, 0);
-		/* Immediate update */
-		hdl->htim->Instance->EGR = TIM_EGR_UG;
-		return STOPPED;
+/*
+ * @brief Set PWM signal Duty Cycle
+ * @param Pointer to Motor Handle structure
+ * @param Duty Cycle, PID output value [-1.0; 1.0]
+ */
+Motor_Status_te Motor_SetDutyCycle(Motor_Handle_t *MotorHandle, float float_DutyCycle)
+{
+	Motor_Status_te Enum_MotorStatus = MOTOR_STATUS_INVALID;
+	uint16_t uint16_Ccr = 0;
 
-	} else if (duty_cycle < 0) {
-		HAL_GPIO_WritePin(hdl->GPIOx, hdl->GPIO_Pinx, CCW);
-		return CCW;
+	MotorHandle->float_DutyCycle = abs(float_DutyCycle);
 
-	} else {
-		HAL_GPIO_WritePin(hdl->GPIOy, hdl->GPIO_Piny, CW);
-		return CW;
-
+	if (float_DutyCycle == 0)
+	{
+		Enum_MotorStatus = Motor_SetSpinDirection(MotorHandle, MOTOR_STATUS_STOPPED);
+	}
+	else if (float_DutyCycle < 0)
+	{
+		Enum_MotorStatus = Motor_SetSpinDirection(MotorHandle, MOTOR_STATUS_CCW);
+	}
+	else
+	{
+		Enum_MotorStatus = Motor_SetSpinDirection(MotorHandle, MOTOR_STATUS_CW);
 	}
 
-	uint16_t ccr = (uint16_t) (abs(duty_cycle) * (float) (1 + ARR_VALUE));
-	__HAL_TIM_SET_COMPARE(hdl->htim, hdl->TIM_CHANNEL, ccr);
+	/* Calculate value of CCR register */
+	uint16_Ccr = (uint16_t) (abs(float_DutyCycle) * (float) (1 + ARR_VALUE));
+	__HAL_TIM_SET_COMPARE(MotorHandle->htim, MotorHandle->uint32_TimChannel, uint16_Ccr);
+
 	/* Immediate update */
-	hdl->htim->Instance->EGR = TIM_EGR_UG;
+	MotorHandle->htim->Instance->EGR = TIM_EGR_UG;
+
+	return Enum_MotorStatus;
 }
 
-Motor_Status_TypeDef set_SpinDirection(Motor_Handle_TypeDef *hdl, Motor_Status_TypeDef direction) {
-
-	if (direction == CW) {
-		hdl->spin_direction = CW;
-		HAL_GPIO_WritePin(hdl->GPIOx, hdl->GPIO_Pinx, CW);
-		return CW;
-
-	} else if (direction == CCW) {
-		hdl->spin_direction = CCW;
-		HAL_GPIO_WritePin(hdl->GPIOx, hdl->GPIO_Pinx, CCW);
-		return CCW;
-
-	} else {
+/*
+ * @brief Set motor spin direction
+ * @param Pointer to Motor Handle structure
+ * @param Spin Direction (Clockwise, CounterClockwise or Stopped)
+ */
+Motor_Status_te Motor_SetSpinDirection(Motor_Handle_t *MotorHandle, Motor_Status_te Enum_Direction)
+{
+	if (Enum_Direction == MOTOR_STATUS_CW)
+	{
+		MotorHandle->uint8_SpinDirection = MOTOR_STATUS_CW;
+		HAL_GPIO_WritePin(MotorHandle->GPIO_Port_SpinDirection, MotorHandle->GPIO_Pin_SpinDirection, GPIO_PIN_SET);
+		return MOTOR_STATUS_CW;
+	}
+	else if (Enum_Direction == MOTOR_STATUS_CCW)
+	{
+		MotorHandle->uint8_SpinDirection = MOTOR_STATUS_CCW;
+		HAL_GPIO_WritePin(MotorHandle->GPIO_Port_SpinDirection, MotorHandle->GPIO_Pin_SpinDirection, GPIO_PIN_RESET);
+		return MOTOR_STATUS_CCW;
+	}
+	else
+	{
 		/*Stop the motor from PWM (set dc to 0)*/
-		__HAL_TIM_SET_COMPARE(hdl->htim, hdl->TIM_CHANNEL, 0);
+		__HAL_TIM_SET_COMPARE(MotorHandle->htim, MotorHandle->uint32_TimChannel, 0);
 		/* Immediate update */
-		hdl->htim->Instance->EGR = TIM_EGR_UG;
-		return STOPPED;
+		MotorHandle->htim->Instance->EGR = TIM_EGR_UG;
+		return MOTOR_STATUS_STOPPED;
 	}
 }
 
-void set_Brake(Motor_Handle_TypeDef *hdl, GPIO_PinState state) {
-	hdl->brake = state;
-	HAL_GPIO_WritePin(hdl->GPIOy, hdl->GPIO_Piny, state);
-}
+/*
+ * @brief Set Brake (On or Off)
+ * @param Pointer to Motor Brake structure
+ * @param Brake state to apply
+ */
+void Motor_SetBrake(Motor_Brake_t *psMotorBrake, Motor_BrakeState_te Enum_BrakeState)
+{
+	GPIO_PinState PinState = GPIO_PIN_RESET;
+	psMotorBrake->Enum_BrakeState = Enum_BrakeState;
 
+	if (BRAKE_OFF == Enum_BrakeState)
+	{
+		PinState = GPIO_PIN_SET;
+	}
+	else if (BRAKE_ON == Enum_BrakeState)
+	{
+		PinState = GPIO_PIN_RESET;
+	}
+
+	HAL_GPIO_WritePin(psMotorBrake->GPIO_Port_Brake, psMotorBrake->GPIO_Pin_Brake, PinState);
+}
