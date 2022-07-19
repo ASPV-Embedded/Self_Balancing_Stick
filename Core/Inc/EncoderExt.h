@@ -8,20 +8,20 @@
 #ifndef __ENCODEREXT_H_
 #define __ENCODEREXT_H_
 
-#include "stm32f446xx.h"
+#include "main.h"
 
-typedef struct __Encoder_Handle {
+typedef struct {
 	/* Timer Handler */
 	TIM_TypeDef *tim;
 	/* Variables */
-	float theta = 0;
-	float Speed = 0;
-	unsigned long Time = 0;
+	float theta;
+	float Speed;
+	unsigned long Time;
 	/* IMPORTANT : the DIR bit is stored in tim->CR1 */
 } Encoder_Handle_TypeDef;
 
 /* Public Functions */
 
-void get_Encoder_Speed(float *speed);
+void get_Encoder_Speed(Encoder_Handle_TypeDef *hdl, float *speed);
 
 #endif /* __ENCODEREXT_H_ */

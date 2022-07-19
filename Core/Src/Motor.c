@@ -17,7 +17,7 @@ void MotorInit (Motor_Handle_TypeDef *hdl){
 Motor_Status_TypeDef set_DutyCycle(Motor_Handle_TypeDef *hdl, float duty_cycle) {
 	hdl->duty_cycle = abs(duty_cycle);
 	if (duty_cycle == 0) {
-		__HAL_TIM_SET_COMPARE(htim, TIM_CHANNEL_1, 0);
+		__HAL_TIM_SET_COMPARE(hdl->htim, TIM_CHANNEL_1, 0);
 		/* Immediate update */
 		hdl->htim->Instance->EGR = TIM_EGR_UG;
 		return STOPPED;
@@ -32,7 +32,7 @@ Motor_Status_TypeDef set_DutyCycle(Motor_Handle_TypeDef *hdl, float duty_cycle) 
 
 	}
 
-	ccr = (uint16_t) (abs(duty_cycle) * (float) (1 + ARR_VALUE))
+	uint16_t ccr = (uint16_t) (abs(duty_cycle) * (float) (1 + ARR_VALUE));
 	__HAL_TIM_SET_COMPARE(hdl->htim, hdl->TIM_CHANNEL, ccr);
 	/* Immediate update */
 	hdl->htim->Instance->EGR = TIM_EGR_UG;

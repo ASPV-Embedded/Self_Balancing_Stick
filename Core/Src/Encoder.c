@@ -12,7 +12,7 @@ void get_Encoder_Speed(Encoder_Handle_TypeDef *hdl, float *speed){
 	float theta_k_1 = hdl->theta;
 	float Prev_Speed = hdl->Speed;
 	unsigned long Time_Saved = hdl->Time;
-	unsigned long Time_Now = __MICROS();
+	unsigned long Time_Now = HAL_GetTick();
 
 	float Ang_Speed_Unfiltered;
 	float Ang_Speed;
@@ -25,8 +25,8 @@ void get_Encoder_Speed(Encoder_Handle_TypeDef *hdl, float *speed){
 	/* FIXME : determine if this low-pass filter is appropriate */
 	Ang_Speed = ((1 - SPEED_FILTER) * Ang_Speed_Unfiltered) + (SPEED_FILTER * Prev_Speed);
 
-	*speed = Ang_speed;
+	*speed = Ang_Speed;
 	hdl->theta = theta_k;
-	hdl->Speed = Ang_speed;
+	hdl->Speed = Ang_Speed;
 	hdl->Time = Time_Now;
 }

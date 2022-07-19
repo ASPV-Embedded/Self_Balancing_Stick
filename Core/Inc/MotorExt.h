@@ -8,17 +8,17 @@
 #ifndef __MOTOREXT_H_
 #define __MOTOREXT_H_
 
-#include "stm32f4xx_hal.h"
+#include "main.h"
 
-
-typedef enum __Motor_Status {
+typedef enum
+{
 	CW = 1,
 	CCW = 0,
 	STOPPED = -1
 } Motor_Status_TypeDef;
 
 
-typedef struct __Motor_Handle
+typedef struct
 {
 	/* Timer handler */
 	TIM_HandleTypeDef *htim;
