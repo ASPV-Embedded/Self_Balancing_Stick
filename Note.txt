@@ -1,0 +1,28 @@
+Assume PCLK for each motor timer is 72MHz (check this for each change in MCU!!!)
+Assume ARR = 255 (based on the controller code and motor voltage routines)
+(PSC+1)*(ARR+1) = Fclk/Fpwm = ratio = 72MHz / 50 kHz = 1440
+PSC = (ratio/(ARR+1)) -1 = (1440/256) -1 = 5.625, rounded to 6
+Check:
+Fpwm = Fclk/(ARR+1)/(PSC+1) = 72E6 / 256 / 7 = 40.1 kHz
+
+APB1/APB2 Timer clock = Fclk = 84 MHz
+ARR = 1000 (perchè sì)
+Frequenza PWM motori = Fpwm compresa tra 20 e 30 KHz
+
+Calcolo prescaler
+Ratio = Fclk/Fpwm = 84 MHz / 30 KHz = 2800
+Prescaler = PSC = (Ratio/(ARR+1)) -1 = (2800 / 1001) - 1 = 1,79 ≈ 2
+
+Check
+Fpwm = Fclk/(ARR+1)/(PSC+1) = 84*10^6 / 1001 / 3 = 27972 ≈ 28 KHz
+
+
+
+/////////////////// OFFSET IMU
+
+Offset Accelerazione X = 1449;
+Offset Accelerazione Y = -326;
+Offset Accelerazione Z = 862;
+Offset Giroscopio X = -362;
+Offset Giroscopio Y = -345;
+Offset Giroscopio Z = -174;
