@@ -140,6 +140,8 @@ int main(void)
   _sMotorHandleY.htim = &_htim2;
   Motor_Init(&_sMotorHandleY);
 
+  Encoder_Init(&_htim3, &_htim4);
+
   Controller_Init(&_sControllerX,
 		   	   	  0,
 				  0,
@@ -178,7 +180,7 @@ int main(void)
   {
     /* USER CODE END WHILE */
 
-	  /* USER CODE BEGIN 3 */
+    /* USER CODE BEGIN 3 */
 //	  MPU6050_Calibrate(&_hi2c);
 
 	  Controller_GetPIDVoltageValue(&_sControllerX, &_float_VoltageValueX);
