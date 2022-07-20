@@ -9,45 +9,40 @@
 #define CONTROLLER_EXT_H_
 
 #include "main.h"
-//#include "motor_Ext.h""
+#include "MotorExt.h"
 #include "mpu6050_Ext.h"
-//#include "encoder_Ext.h"
+#include "EncoderExt.h"
 
-typedef struct {
-//	float angle_Average_Filter;
-//	float angle_Smoothed_Filter;
-//	float angle_Zero_Filter;
-//	ExponentialFilter angleAverageFilter;
-//	ExponentialFilter angleSmoothedFilter;
-//	ExponentialFilter angleZeroFilter;
-	float float_StictionSpeedThreshold;  // RPM
-	float float_AngleSetpoint;
+typedef enum
+{
+	CONTROLLER_AXIS_X = 0,
+	CONTROLLER_AXIS_Y = 1,
+	CONTREOLLER_AXIS_NUMBER
+} ControllerAxis_te;
+
+typedef struct
+{
+	ControllerAxis_te Enum_ControllerAxis;
 	int32_t int32_PID_Voltage;
+
 	float float_Kp;
 	float float_Ki;
 	float float_Kd;
 	float float_Ks;
-//	float Kt;
-//	float Ktd;
+
+	float float_AngleSetpoint;
 	float float_AngleIntegralError;
 	float float_LastError;
-//	const float angle_Speed_Filter;
 	float float_AngleIntegralMax;
 	float float_AngleIntegralMin;
-//	float angle_Smoothed;
-//	float angle_Smoothed_Speed;
-	// Defines amount of voltage added to compensate for motor stiction, [0 - 255].
-	// The other option to use is the motor voltage_Offset.
-	// voltage_Offset is ALWAYS used, while friction_Value is applied at low speeds.
-	// friction value was used in the original source.
+
+	float float_StictionSpeedThreshold;  // RPM
 	float float_FrictionValue;
-//	Controller_Mode_te ENUM_Mode;
-	uint8_t uint8_Angle; // 0 = x, 1 = y
-//	int default_voltage;
-}Controller_t;
+
+} Controller_t;
 
 Error_t Controller_Init(Controller_t *psController,
-						uint8_t uint8_Angle,
+						ControllerAxis_te Enum_ControllerAxis,
 						float float_AngleSetpoint,
 						float float_Kp,
 						float float_Ki,

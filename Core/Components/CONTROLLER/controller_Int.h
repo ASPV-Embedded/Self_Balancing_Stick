@@ -10,13 +10,8 @@
 
 #include "controller_Ext.h"
 
-//typedef enum
-//{
-//	OFF,
-//	MANUAL,
-//	AUTO
-//}Controller_Mode_te ;
+#define MOTOR_VMAX 		1000
 
-#define MOTOR_VMAX 1000
+#define RAD_S_TO_RPM_CONVERSION_FACTOR 		9.549297
 
 #endif /* CONTROLLER_INT_H_ */
