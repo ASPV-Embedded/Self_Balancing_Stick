@@ -1,8 +1,9 @@
 #MicroXplorer Configuration settings - do not modify
 ADC1.Channel-2\#ChannelRegularConversion=ADC_CHANNEL_14
-ADC1.IPParameters=Rank-2\#ChannelRegularConversion,master,Channel-2\#ChannelRegularConversion,SamplingTime-2\#ChannelRegularConversion,NbrOfConversionFlag
+ADC1.IPParameters=Rank-2\#ChannelRegularConversion,master,Channel-2\#ChannelRegularConversion,SamplingTime-2\#ChannelRegularConversion,NbrOfConversionFlag,Resolution
 ADC1.NbrOfConversionFlag=1
 ADC1.Rank-2\#ChannelRegularConversion=1
+ADC1.Resolution=ADC_RESOLUTION_10B
 ADC1.SamplingTime-2\#ChannelRegularConversion=ADC_SAMPLETIME_3CYCLES
 ADC1.master=1
 File.Version=6
@@ -115,7 +116,7 @@ ProjectManager.AskForMigrate=true
 ProjectManager.BackupPrevious=false
 ProjectManager.CompilerOptimize=6
 ProjectManager.ComputerToolchain=false
-ProjectManager.CoupleFile=false
+ProjectManager.CoupleFile=true
 ProjectManager.CustomerFirmwarePackage=
 ProjectManager.DefaultFWLocation=true
 ProjectManager.DeletePrevious=true
