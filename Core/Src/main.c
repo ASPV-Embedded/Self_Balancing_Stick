@@ -25,6 +25,8 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "i2c.h"
+#include "gpio.h"
 #include "mpu6050_Ext.h"
 #include "controller_Ext.h"
 #include "MotorExt.h"
@@ -50,8 +52,15 @@
 
 /* USER CODE BEGIN PV */
 
+ADC_HandleTypeDef _hadc1;
+TIM_HandleTypeDef _htim2;
+TIM_HandleTypeDef _htim3;
+TIM_HandleTypeDef _htim4;
+TIM_HandleTypeDef _htim10;
+
 /* IMU section */
 MPU6050_Data_t _sMPU6050_Data;
+I2C_HandleTypeDef _hi2c;
 
 /* Controller section*/
 Controller_t _sControllerX;
@@ -103,34 +112,36 @@ int main(void)
   SystemClock_Config();
 
   /* USER CODE BEGIN SysInit */
-  memset(&hi2c2, 0x0, sizeof(hi2c2));
+  memset(&_hi2c, 0x0, sizeof(_hi2c));
 
   /* USER CODE END SysInit */
 
   /* Initialize all configured peripherals */
+  MX_GPIO_Init();
   MX_TIM2_Init();
   MX_TIM3_Init();
   MX_TIM4_Init();
   MX_TIM10_Init();
-  MX_ADC1_Init();
-  MX_GPIO_Init();
   MX_I2C2_Init();
+  MX_ADC1_Init();
   /* USER CODE BEGIN 2 */
+  MX_GPIO_Init();
+  MX_I2C2_Init(&_hi2c);
 
-  while (MPU6050_Init(&hi2c2) == 1)
+  while (MPU6050_Init(&_hi2c) == 1)
   {
 	  HAL_Delay (100);
   }
 
   memset(&_sMotorHandleX , 0, sizeof(_sMotorHandleX));
-  _sMotorHandleX.htim = &htim2;
+  _sMotorHandleX.htim = &_htim2;
   Motor_Init(&_sMotorHandleX);
 
   memset(&_sMotorHandleY , 0, sizeof(_sMotorHandleY));
-  _sMotorHandleY.htim = &htim2;
+  _sMotorHandleY.htim = &_htim2;
   Motor_Init(&_sMotorHandleY);
 
-  Encoder_Init(htim3.Instance, htim4.Instance);
+  Encoder_Init(&_htim3, &_htim4);
 
   Controller_Init(&_sControllerX,
 		   	   	  0,
@@ -225,7 +236,7 @@ void SystemClock_Config(void)
   RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
   RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
   RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV2;
-  RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
+  RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV8;
 
   if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_2) != HAL_OK)
   {
