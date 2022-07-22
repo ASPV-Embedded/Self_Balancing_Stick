@@ -10,7 +10,7 @@
 
 #include "Battery_StatusExt.h"
 
-#define VREF 3.3 /* FIXME: This value have to be measured !!! */
-
+uint16_t *Vrefin_cal = VREFINT_CAL_ADDR;
+float VDDA;
 
 #endif /* COMPONENTS_BATTERY_STATUS_BATTERY_STATUSINT_H_ */
