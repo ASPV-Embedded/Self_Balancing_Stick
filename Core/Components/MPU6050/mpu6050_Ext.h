@@ -8,14 +8,13 @@
 #ifndef MPU6050_EXT_H_
 #define MPU6050_EXT_H_
 
-//////////// INCLUDES //////////////////
-
+/* INCLUDES */
 #include "i2c.h"
 #include "main.h"
 
-//////////// DEFINES //////////////////
+/* DEFINES */
 
-// MPU6050 structure
+/* MPU6050 structure */
 typedef struct {
 
     int16_t Accel_X_RAW;
@@ -45,7 +44,7 @@ typedef struct {
 
 } MPU6050_Angles_t;
 
-//////////// PUBLIC FUNCTIONS //////////////////
+/* PUBLIC FUNCTIONS */
 
 uint8_t MPU6050_Init(I2C_HandleTypeDef *I2Cx);
 
