@@ -40,6 +40,10 @@ extern ADC_HandleTypeDef hadc1;
 
 void MX_ADC1_Init(void);
 
+void ADC_Select_VREFINT();
+
+void ADC_Select_CH14();
+
 /* USER CODE BEGIN Prototypes */
 
 /* USER CODE END Prototypes */
