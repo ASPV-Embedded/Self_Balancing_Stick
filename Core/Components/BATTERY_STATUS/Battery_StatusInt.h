@@ -10,7 +10,8 @@
 
 #include "Battery_StatusExt.h"
 
-uint16_t *Vrefin_cal = VREFINT_CAL_ADDR;
-float VDDA;
+uint16_t *_pVrefin_cal = VREFINT_CAL_ADDR;
+
+float _VDDA;
 
 #endif /* COMPONENTS_BATTERY_STATUS_BATTERY_STATUSINT_H_ */

@@ -8,9 +8,13 @@
 #ifndef COMPONENTS_BATTERY_STATUS_BATTERY_STATUSEXT_H_
 #define COMPONENTS_BATTERY_STATUS_BATTERY_STATUSEXT_H_
 
+#include "main.h"
+#include "adc.h"
+
 /* Public Functions */
 
-HAL_StatusTypeDef get_Battery_Status (ADC_HandleTypeDef hadc, float *stat);
-void Battery_Status_ADC_Cal(ADC_HandleTypeDef *hVrefint);
+Error_t Battery_Status_GetBatteryChargePercentage (ADC_HandleTypeDef *pAdcHandle, float *float_BatteryPercentage);
+
+void Battery_Status_AdcCal(ADC_HandleTypeDef *pAdcVrefintHandle);
 
 #endif /* COMPONENTS_BATTERY_STATUS_BATTERY_STATUSEXT_H_ */

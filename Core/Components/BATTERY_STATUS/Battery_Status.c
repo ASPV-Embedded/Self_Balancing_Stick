@@ -5,54 +5,64 @@
  *      Author: Federico Altieri
  */
 
-
 #include "Battery_StatusInt.h"
-
 
 /**
  * @brief  Read and convert from the ADC the battery voltage coming
  *         from a voltage divider.
- * @param  ADC handler address
- * @retval Battery Status in percentage
+ * @param  [in] ADC handler address
+ * @param  [out] Battery Charge value in percentage
  */
 
-HAL_StatusTypeDef get_Battery_Status (ADC_HandleTypeDef *hadc, float *stat){
+Error_t Battery_Status_GetBatteryChargePercentage (ADC_HandleTypeDef *pAdcHandle, float *float_BatteryPercentage)
+{
+	Error_t Error = E_NOT_OK;
 
-	uint16_t ADC_Value;
-	float Vin;
-
-
-	ADC_Select_CH14();
-	HAL_ADC_Start(hadc);
-
-	if (HAL_ADC_PollForConversion(hadc, 100) != HAL_OK){
-		 Error_Handler();
-	} else {
-		ADC_Value = (uint16_t)HAL_ADC_GetValue(hadc);
-		Vin = (float) ADC_Value * VDDA / ADC_GET_RESOLUTION(hadc); /* hadc->Init->Resolution */
-
-		return HAL_OK;
+	if ((NULL != pAdcHandle) && (NULL != float_BatteryPercentage))
+	{
+		Error = E_OK;
 	}
 
-	*stat = Vin / VDDA * 100.0;
-	HAL_ADC_Stop(hadc);
-}
+	if (E_OK == Error)
+	{
+		uint16_t uint16_ADC_Value = 0;
+		float float_Vin = 0;
 
+		ADC_Select_CH14();
+		HAL_ADC_Start(pAdcHandle);
+
+		if (HAL_ADC_PollForConversion(pAdcHandle, 100) != HAL_OK)
+		{
+//			Error_Handler();
+			Error = E_NOT_OK;
+		}
+		else
+		{
+			uint16_ADC_Value = (uint16_t)HAL_ADC_GetValue(pAdcHandle);
+			float_Vin = (float) uint16_ADC_Value * _VDDA / ADC_GET_RESOLUTION(pAdcHandle); /* AdcHandle->Init->Resolution */
+		}
+
+		if (E_OK == Error)
+		{
+			*float_BatteryPercentage = float_Vin / _VDDA * 100.0;
+			HAL_ADC_Stop(pAdcHandle);
+		}
+	}
+
+	return Error;
+}
 
 /**
  * @brief  Calculate VDDA.
  * @param  ADC handler address for Vrefint channel
- * @retval VDDA value
  */
 
-void Battery_Status_ADC_Cal(ADC_HandleTypeDef *hVrefint) {
+void Battery_Status_AdcCal(ADC_HandleTypeDef *pAdcVrefintHandle)
+{
 	/*https://electronics.stackexchange.com/questions/449478/adc-calibration-vdd-calculation*/
 	/* IMPORTANT: minimum sampling time 10us */
 	ADC_Select_VREFINT();
-	HAL_ADC_Start(hadc);
-	VDDA = VREFINT_CAL_VREF * (*Vrefin_cal) / hVrefint->Instance->DR;/* Vrefin_cal is a binary number, VDDA in mV */
-	HAL_ADC_Stop(hadc);
+	HAL_ADC_Start(pAdcVrefintHandle);
+	_VDDA = VREFINT_CAL_VREF * (*_pVrefin_cal) / pAdcVrefintHandle->Instance->DR;/* Vrefin_cal is a binary number, VDDA in mV */
+	HAL_ADC_Stop(pAdcVrefintHandle);
 }
-
-
-
