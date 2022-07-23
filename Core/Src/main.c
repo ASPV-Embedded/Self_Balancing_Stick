@@ -25,8 +25,6 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "i2c.h"
-#include "gpio.h"
 #include "mpu6050_Ext.h"
 #include "controller_Ext.h"
 #include "MotorExt.h"
@@ -52,15 +50,8 @@
 
 /* USER CODE BEGIN PV */
 
-ADC_HandleTypeDef _hadc1;
-TIM_HandleTypeDef _htim2;
-TIM_HandleTypeDef _htim3;
-TIM_HandleTypeDef _htim4;
-TIM_HandleTypeDef _htim10;
-
 /* IMU section */
 MPU6050_Data_t _sMPU6050_Data;
-I2C_HandleTypeDef _hi2c;
 
 /* Controller section*/
 Controller_t _sControllerX;
@@ -75,6 +66,8 @@ float _float_DutyCycleX = 0;
 Motor_Handle_t _sMotorHandleY;
 float _float_VoltageValueY = 0;
 float _float_DutyCycleY = 0;
+
+Motor_Brake_t _sMotorBrake;
 
 /* USER CODE END PV */
 
@@ -112,7 +105,7 @@ int main(void)
   SystemClock_Config();
 
   /* USER CODE BEGIN SysInit */
-  memset(&_hi2c, 0x0, sizeof(_hi2c));
+  memset(&hi2c2, 0x0, sizeof(hi2c2));
 
   /* USER CODE END SysInit */
 
@@ -125,23 +118,22 @@ int main(void)
   MX_I2C2_Init();
   MX_ADC1_Init();
   /* USER CODE BEGIN 2 */
-  MX_GPIO_Init();
-  MX_I2C2_Init(&_hi2c);
 
-  while (MPU6050_Init(&_hi2c) == 1)
+  while (MPU6050_Init(&hi2c2) == 1)
   {
 	  HAL_Delay (100);
   }
 
   memset(&_sMotorHandleX , 0, sizeof(_sMotorHandleX));
-  _sMotorHandleX.htim = &_htim2;
+  _sMotorHandleX.htim = &htim2;
+  _sMotorHandleX.uint32_TimChannel = TIM_CHANNEL_1;
   Motor_Init(&_sMotorHandleX);
 
   memset(&_sMotorHandleY , 0, sizeof(_sMotorHandleY));
-  _sMotorHandleY.htim = &_htim2;
+  _sMotorHandleY.htim = &htim2;
   Motor_Init(&_sMotorHandleY);
 
-  Encoder_Init(&_htim3, &_htim4);
+  Encoder_Init(htim3.Instance, htim4.Instance);
 
   Controller_Init(&_sControllerX,
 		   	   	  0,
@@ -165,7 +157,6 @@ int main(void)
 				  100,
 				  -100);
 
-
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -177,12 +168,19 @@ int main(void)
 	  HAL_Delay (100);
   }
 
+  _sMotorBrake.Enum_BrakeState = BRAKE_OFF;
+  _sMotorBrake.GPIO_Pin_Brake = BRAKE_XY_Pin;
+  _sMotorBrake.GPIO_Port_Brake = BRAKE_XY_GPIO_Port;
+  Motor_BrakeState_te Enum_BrakeState = BRAKE_OFF;
+
+  Motor_SetBrake(&_sMotorBrake, Enum_BrakeState);
+
   while (1)
   {
-    /* USER CODE END WHILE */
+	  /* USER CODE END WHILE */
 
-    /* USER CODE BEGIN 3 */
-//	  MPU6050_Calibrate(&_hi2c);
+	  /* USER CODE BEGIN 3 */
+	  //	  MPU6050_Calibrate(&hi2c2);
 
 	  Controller_GetPIDVoltageValue(&_sControllerX, &_float_VoltageValueX);
 	  Controller_CalculateDutyCycle(_float_VoltageValueX, &_float_DutyCycleX);
