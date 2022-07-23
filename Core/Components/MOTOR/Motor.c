@@ -18,6 +18,7 @@ void Motor_Init (Motor_Handle_t *MotorHandle)
 	HAL_TIM_PWM_Stop(MotorHandle->htim, MotorHandle->uint32_TimChannel);
 	MotorHandle->htim->Instance->ARR = ARR_VALUE;
 	MotorHandle->htim->Instance->PSC = PSC_VALUE;
+	HAL_TIM_PWM_Start(MotorHandle->htim, MotorHandle->uint32_TimChannel);
 }
 
 /*
@@ -30,7 +31,7 @@ Motor_Status_te Motor_SetDutyCycle(Motor_Handle_t *MotorHandle, float float_Duty
 	Motor_Status_te Enum_MotorStatus = MOTOR_STATUS_INVALID;
 	uint16_t uint16_Ccr = 0;
 
-	MotorHandle->float_DutyCycle = abs(float_DutyCycle);
+	MotorHandle->float_DutyCycle = fabs(float_DutyCycle);
 
 	if (float_DutyCycle == 0)
 	{
@@ -44,9 +45,8 @@ Motor_Status_te Motor_SetDutyCycle(Motor_Handle_t *MotorHandle, float float_Duty
 	{
 		Enum_MotorStatus = Motor_SetSpinDirection(MotorHandle, MOTOR_STATUS_CW);
 	}
-
 	/* Calculate value of CCR register */
-	uint16_Ccr = (uint16_t) (abs(float_DutyCycle) * (float) (1 + ARR_VALUE));
+	uint16_Ccr = (uint16_t) (MotorHandle->float_DutyCycle * (float) (1 + ARR_VALUE));
 	__HAL_TIM_SET_COMPARE(MotorHandle->htim, MotorHandle->uint32_TimChannel, uint16_Ccr);
 
 	/* Immediate update */
