@@ -119,6 +119,10 @@ int main(void)
   MX_ADC1_Init();
   /* USER CODE BEGIN 2 */
 
+  // Start timer
+  HAL_TIM_Base_Start_IT(&htim3);
+  HAL_TIM_Base_Start_IT(&htim4);
+
   while (MPU6050_Init(&hi2c2) == 1)
   {
 	  HAL_Delay (100);

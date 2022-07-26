@@ -58,26 +58,16 @@ void Encoder_GetEncoderSpeed(Encoder_te Enum_Encoder, float *pfloat_Speed)
 	*puint16_CntOverflow = 0;
 }
 
-void TIM3_IRQHandler(void)
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
-	//	HAL_TIM_IRQHandler(&_htim3);
-	if(TIM_SR_UIF&&TIM3->SR)
+	if (htim == &htim3)
 	{
 		//FIXME: Capire quanto vale CNT in questo istante
-		_uint16_Tim3CntOverflow = abs(TIM3->CNT - _sEncoderX.uint16_LastCnt);
-
-		TIM3->SR&=~TIM_SR_UIF;
+		_uint16_Tim3CntOverflow = abs(htim->Instance->CNT - _sEncoderX.uint16_LastCnt);
 	}
-}
-
-void TIM4_IRQHandler(void)
-{
-	//	HAL_TIM_IRQHandler(&_htim4);
-	if(TIM_SR_UIF&&TIM4->SR)
+	else if (htim == &htim4)
 	{
 		//FIXME: Capire quanto vale CNT in questo istante
-		_uint16_Tim4CntOverflow = abs(TIM4->CNT - _sEncoderY.uint16_LastCnt);
-
-		TIM4->SR&=~TIM_SR_UIF;
+		_uint16_Tim4CntOverflow = abs(htim->Instance->CNT - _sEncoderY.uint16_LastCnt);
 	}
 }
