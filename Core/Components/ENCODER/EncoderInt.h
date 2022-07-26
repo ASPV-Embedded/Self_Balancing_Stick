@@ -9,6 +9,7 @@
 #define __ENCODERINT_H_
 
 #include "EncoderExt.h"
+#include "tim.h"
 
 #define PI 3.14159265358979323846
 
