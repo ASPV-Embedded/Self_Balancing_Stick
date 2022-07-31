@@ -50,7 +50,7 @@ typedef struct
 } Motor_Brake_t;
 
 
-void Motor_Init (Motor_Handle_t *MotorHandle);
+void Motor_Init (Motor_Handle_t *MotorHandle, Motor_Brake_t *psMotorBrake);
 
 Motor_Status_te Motor_SetDutyCycle (Motor_Handle_t *MotorHandle, float float_DutyCycle);
 

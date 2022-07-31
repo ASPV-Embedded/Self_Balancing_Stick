@@ -12,13 +12,17 @@
  * @brief Initialize Motor
  * @param Pointer to Motor Handle structure
  */
-void Motor_Init (Motor_Handle_t *MotorHandle)
+void Motor_Init (Motor_Handle_t *MotorHandle, Motor_Brake_t *psMotorBrake)
 {
+	Motor_BrakeState_te Enum_BrakeState = BRAKE_ON;
+	Motor_SetBrake(psMotorBrake, Enum_BrakeState);
+
 	/* Operazione da effettuare per entrambi i motori, timer unico ma diversi canali */
 	HAL_TIM_PWM_Stop(MotorHandle->htim, MotorHandle->uint32_TimChannel);
 	MotorHandle->htim->Instance->ARR = ARR_VALUE;
 	MotorHandle->htim->Instance->PSC = PSC_VALUE;
 	HAL_TIM_PWM_Start(MotorHandle->htim, MotorHandle->uint32_TimChannel);
+	Motor_SetSpinDirection(MotorHandle, MOTOR_STATUS_STOPPED);
 }
 
 /*
@@ -46,8 +50,8 @@ Motor_Status_te Motor_SetDutyCycle(Motor_Handle_t *MotorHandle, float float_Duty
 		Enum_MotorStatus = Motor_SetSpinDirection(MotorHandle, MOTOR_STATUS_CW);
 	}
 	/* Calculate value of CCR register */
-	uint16_Ccr = (uint16_t) (MotorHandle->float_DutyCycle * (float) (1 + ARR_VALUE));
-	__HAL_TIM_SET_COMPARE(MotorHandle->htim, MotorHandle->uint32_TimChannel, uint16_Ccr);
+	uint16_Ccr = (uint16_t) (MotorHandle->float_DutyCycle * (float)(ARR_VALUE));
+	__HAL_TIM_SET_COMPARE(MotorHandle->htim, MotorHandle->uint32_TimChannel, (ARR_VALUE - uint16_Ccr));
 
 	/* Immediate update */
 	MotorHandle->htim->Instance->EGR = TIM_EGR_UG;
@@ -77,7 +81,7 @@ Motor_Status_te Motor_SetSpinDirection(Motor_Handle_t *MotorHandle, Motor_Status
 	else
 	{
 		/*Stop the motor from PWM (set dc to 0)*/
-		__HAL_TIM_SET_COMPARE(MotorHandle->htim, MotorHandle->uint32_TimChannel, 0);
+		__HAL_TIM_SET_COMPARE(MotorHandle->htim, MotorHandle->uint32_TimChannel, ARR_VALUE);
 		/* Immediate update */
 		MotorHandle->htim->Instance->EGR = TIM_EGR_UG;
 		return MOTOR_STATUS_STOPPED;

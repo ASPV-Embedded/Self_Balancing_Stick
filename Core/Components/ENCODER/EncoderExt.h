@@ -20,6 +20,7 @@ typedef struct {
 	float float_LastSpeed;
 	uint32_t xLastTick;
 	uint16_t uint16_LastCnt;
+	Bool_t Bool_IsValueToBeDiscarded;
 	/* IMPORTANT : the DIR bit is stored in tim->CR1 */
 } Encoder_Handle_TypeDef;
 

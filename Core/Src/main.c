@@ -120,6 +120,8 @@ int main(void)
   /* USER CODE BEGIN 2 */
 
   // Start timer
+  __HAL_TIM_CLEAR_IT(&htim3, TIM_IT_UPDATE);
+  __HAL_TIM_CLEAR_IT(&htim4, TIM_IT_UPDATE);
   HAL_TIM_Base_Start_IT(&htim3);
   HAL_TIM_Base_Start_IT(&htim4);
 //  while (MPU6050_Init(&hi2c2) == 1)
@@ -127,29 +129,31 @@ int main(void)
 //	  HAL_Delay (100);
 //  }
 //
+  //_sMotorBrake.Enum_BrakeState = BRAKE_OFF;
+  //_sMotorBrake.GPIO_Pin_Brake = BRAKE_XY_Pin;
+  //_sMotorBrake.GPIO_Port_Brake = BRAKE_XY_GPIO_Port;
 
   memset(&_sMotorHandleX , 0, sizeof(_sMotorHandleX));
   _sMotorHandleX.htim = &htim2;
   _sMotorHandleX.uint32_TimChannel = TIM_CHANNEL_1;
-  Motor_Init(&_sMotorHandleX);
-//
+  Motor_Init(&_sMotorHandleX, &_sMotorBrake);
+
 //  memset(&_sMotorHandleY , 0, sizeof(_sMotorHandleY));
 //  _sMotorHandleY.htim = &htim2;
 //  Motor_Init(&_sMotorHandleY);
-//
-//  Encoder_Init(htim3.Instance, htim4.Instance);
-//
-//  Controller_Init(&_sControllerX,
-//		   	   	  0,
-//				  0,
-//				  347,
-//				  0,
-//				  77.1,
-//				  26.025,
-//				  0,
-//				  100,
-//				  -100);
-//
+
+  Encoder_Init(htim3.Instance, htim4.Instance);
+
+  Controller_Init(&_sControllerX,
+		   	   	  0,
+				  0,
+				  347,
+				  0,
+				  77.1,
+				  1,
+				  0,
+				  100,
+				  -100);
 //  Controller_Init(&_sControllerY,
 //		   	   	  0,
 //				  0,
@@ -171,15 +175,14 @@ int main(void)
 //  {
 //	  HAL_Delay (100);
 //  }
-uint8_t bool = 0;
-float _float_DutyCycleX = 0;
 
-_sMotorBrake.Enum_BrakeState = BRAKE_OFF;
-_sMotorBrake.GPIO_Pin_Brake = BRAKE_XY_Pin;
-_sMotorBrake.GPIO_Port_Brake = BRAKE_XY_GPIO_Port;
+uint8_t bool = 0;
+
 Motor_BrakeState_te Enum_BrakeState = BRAKE_OFF;
 
 Motor_SetBrake(&_sMotorBrake, Enum_BrakeState);
+
+uint32_t xCurrentTick = 0;
 
   while (1)
   {
@@ -200,6 +203,7 @@ Motor_SetBrake(&_sMotorBrake, Enum_BrakeState);
 //	  Motor_SetDutyCycle(&_sMotorHandleY, _float_DutyCycleY);
 
 	  HAL_Delay (100);
+	  HAL_Delay (100 - (HAL_GetTick() - xCurrentTick));
   }
   /* USER CODE END 3 */
 }

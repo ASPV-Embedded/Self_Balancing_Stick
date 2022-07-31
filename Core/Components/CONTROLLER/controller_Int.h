@@ -10,7 +10,7 @@
 
 #include "controller_Ext.h"
 
-#define MOTOR_VMAX 		1000
+#define MOTOR_VMAX 		10000
 
 #define RAD_S_TO_RPM_CONVERSION_FACTOR 		9.549297
 

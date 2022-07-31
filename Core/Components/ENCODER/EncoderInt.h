@@ -20,7 +20,5 @@
 Encoder_Handle_TypeDef _sEncoderX;
 Encoder_Handle_TypeDef _sEncoderY;
 
-uint16_t _uint16_Tim3CntOverflow = 0;
-uint16_t _uint16_Tim4CntOverflow = 0;
 
 #endif /* __ENCODERINT_H_ */
