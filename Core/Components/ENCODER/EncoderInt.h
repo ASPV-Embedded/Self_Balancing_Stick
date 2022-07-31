@@ -20,5 +20,4 @@
 Encoder_Handle_TypeDef _sEncoderX;
 Encoder_Handle_TypeDef _sEncoderY;
 
-
 #endif /* __ENCODERINT_H_ */

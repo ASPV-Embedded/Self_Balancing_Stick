@@ -95,8 +95,16 @@ typedef char Error_t;
 #define E_NOT_OK    (Error_t)1
 
 typedef char Bool_t;
-#define TRUE		(Bool_t)0
-#define FALSE		(Bool_t)1
+#define FALSE		(Bool_t)0
+#define TRUE		(Bool_t)1
+
+#define Error_Check(Error, Function)	\
+		{								\
+			if (E_OK == Error)			\
+			{							\
+				Error = Function;		\
+			}							\
+		}
 
 /* USER CODE END Private defines */
 

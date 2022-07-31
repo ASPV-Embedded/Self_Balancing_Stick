@@ -10,8 +10,8 @@
 
 #include "main.h"
 
-typedef struct {
-
+typedef struct
+{
 	/* Timer Handler */
 	TIM_TypeDef *tim;
 
@@ -21,7 +21,6 @@ typedef struct {
 	uint32_t xLastTick;
 	uint16_t uint16_LastCnt;
 	Bool_t Bool_IsValueToBeDiscarded;
-	/* IMPORTANT : the DIR bit is stored in tim->CR1 */
 } Encoder_Handle_TypeDef;
 
 typedef enum
@@ -33,8 +32,8 @@ typedef enum
 
 /* Public Functions */
 
-void Encoder_Init(TIM_TypeDef *pTim3Handle, TIM_TypeDef *pTim4Handle);
-void Encoder_GetEncoderSpeed(Encoder_te Enum_Encoder, float *pfloat_Speed);
+Error_t Encoder_Init(TIM_TypeDef *pTim3Handle, TIM_TypeDef *pTim4Handle);
+Error_t Encoder_GetEncoderSpeed(Encoder_te Enum_Encoder, float *pfloat_Speed);
 
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim);
 

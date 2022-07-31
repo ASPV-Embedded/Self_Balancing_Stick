@@ -142,24 +142,6 @@ void MPU6050_Get_Angles(MPU6050_Angles_t *pAngles)
     // Kalman angle solve
     double dt = (double) (HAL_GetTick() - _uint32_Timer) / 1000;
     _uint32_Timer = HAL_GetTick();
-//    double roll;
-//    double roll_sqrt = sqrt(
-//    		DataStruct->Accel_X_RAW * DataStruct->Accel_X_RAW + DataStruct->Accel_Z_RAW * DataStruct->Accel_Z_RAW);
-//    if (roll_sqrt != 0.0) {
-//    	roll = atan(DataStruct->Accel_Y_RAW / roll_sqrt) * RAD_TO_DEG;
-//    } else {
-//    	roll = 0.0;
-//    }
-//    double pitch = atan2(-DataStruct->Accel_X_RAW, DataStruct->Accel_Z_RAW) * RAD_TO_DEG;
-//    if ((pitch < -90 && DataStruct->KalmanAngleY > 90) || (pitch > 90 && DataStruct->KalmanAngleY < -90)) {
-//    	KalmanY.angle = pitch;
-//    	DataStruct->KalmanAngleY = pitch;
-//    } else {
-//    	DataStruct->KalmanAngleY = MPU6050_Kalman_getAngle(&KalmanY, pitch, DataStruct->Gy, dt);
-//    }
-//    if (fabs(DataStruct->KalmanAngleY) > 90)
-//    	DataStruct->Gx = -DataStruct->Gx;
-//    DataStruct->KalmanAngleX = MPU6050_Kalman_getAngle(&_KalmanX, roll, DataStruct->Gx, dt);
 
     // https://www.nxp.com/files-static/sensors/doc/app_note/AN3461.pdf
     double roll = atan2(DataStruct.Accel_Y_RAW, DataStruct.Accel_Z_RAW) * RAD_TO_DEG;

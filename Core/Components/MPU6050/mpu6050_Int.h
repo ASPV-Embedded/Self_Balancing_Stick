@@ -34,7 +34,7 @@
 
 #define MPU6050_I2C_TIMEOUT  (100)
 
-#define MPU6050_VERTICAL_THRESHOLD	 (float)0.5
+#define MPU6050_VERTICAL_THRESHOLD	 (float)3 //[°]
 
 // MPU6050 offsets
 typedef struct {
