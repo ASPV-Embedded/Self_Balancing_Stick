@@ -20,5 +20,12 @@
 Encoder_Handle_TypeDef _sEncoderX;
 Encoder_Handle_TypeDef _sEncoderY;
 
+float float_AngSpeedUnfiltered = 0;
+float float_AngSpeedFiltered = 0;
+float float_ThetaK = 0;
+float float_ThetaK_1 = 0;
+float float_PrevSpeed = 0;
+uint32_t xCurrentTick = 0;
+uint32_t xLastTick = 0;
 
 #endif /* __ENCODERINT_H_ */

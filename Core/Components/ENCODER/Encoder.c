@@ -27,9 +27,8 @@ void Encoder_Init(TIM_TypeDef *pTim3Handle, TIM_TypeDef *pTim4Handle)
 
 void Encoder_GetEncoderSpeed(Encoder_te Enum_Encoder, float *pfloat_Speed)
 {
-	float float_AngSpeedUnfiltered = 0;
-	float float_AngSpeedFiltered = 0;
-	uint32_t xCurrentTick = HAL_GetTick();
+
+	xCurrentTick = HAL_GetTick();
 
 	Encoder_Handle_TypeDef *pEncoder_Handle;
 
@@ -42,21 +41,20 @@ void Encoder_GetEncoderSpeed(Encoder_te Enum_Encoder, float *pfloat_Speed)
 		pEncoder_Handle = &_sEncoderY;
 	}
 
-	float float_ThetaK_1 = pEncoder_Handle->float_LastTheta;
-	float Prev_Speed = pEncoder_Handle->float_LastSpeed;
-	uint32_t xLastTick = pEncoder_Handle->xLastTick;
+	float_ThetaK_1 = pEncoder_Handle->float_LastTheta;
+	float_PrevSpeed = pEncoder_Handle->float_LastSpeed;
+	xLastTick = pEncoder_Handle->xLastTick;
 
 	float_ThetaK = (float)(pEncoder_Handle->tim->CNT)/((float)(RESOLUTION*CPR))*2*PI;	/* Angle position in rad */
-	float float_ThetaK = (float)(pEncoder_Handle->tim->CNT + *puint16_CntOverflow)/((float)(RESOLUTION*CPR))*2*PI;	/* Angle position in rad */
 
 	if (FALSE == pEncoder_Handle->Bool_IsValueToBeDiscarded)
 	{
-	float_AngSpeedUnfiltered = ((float_ThetaK - float_ThetaK_1) / (xCurrentTick - xLastTick)) * 1000;	/* Angular velocity calculation rad/s */
+		float_AngSpeedUnfiltered = ((float_ThetaK - float_ThetaK_1) / (xCurrentTick - xLastTick)) * 1000;	/* Angular velocity calculation rad/s */
 
-	/* FEATURE : correzione della velocità nell'evenienza ci sia un valore non veritiero, a cavallo del reset del counter  */
+		/* FEATURE : correzione della velocità nell'evenienza ci sia un valore non veritiero, a cavallo del reset del counter  */
 
-	/* FIXME : determine if this low-pass filter is appropriate */
-	float_AngSpeedFiltered = ((1 - SPEED_FILTER) * float_AngSpeedUnfiltered) + (SPEED_FILTER * Prev_Speed);
+		/* FIXME : determine if this low-pass filter is appropriate */
+		float_AngSpeedFiltered = ((1 - SPEED_FILTER) * float_AngSpeedUnfiltered) + (SPEED_FILTER * float_PrevSpeed);
 	}
 
 	/* Update Values */

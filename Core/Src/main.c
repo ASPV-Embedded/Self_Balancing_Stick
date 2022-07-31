@@ -124,14 +124,19 @@ int main(void)
   __HAL_TIM_CLEAR_IT(&htim4, TIM_IT_UPDATE);
   HAL_TIM_Base_Start_IT(&htim3);
   HAL_TIM_Base_Start_IT(&htim4);
-//  while (MPU6050_Init(&hi2c2) == 1)
-//  {
-//	  HAL_Delay (100);
-//  }
-//
+
+  while (MPU6050_Init(&hi2c2) == 1)
+  {
+	  HAL_Delay (100);
+  }
+
   //_sMotorBrake.Enum_BrakeState = BRAKE_OFF;
   //_sMotorBrake.GPIO_Pin_Brake = BRAKE_XY_Pin;
   //_sMotorBrake.GPIO_Port_Brake = BRAKE_XY_GPIO_Port;
+
+  _sMotorBrake.Enum_BrakeState = BRAKE_OFF;
+  _sMotorBrake.GPIO_Pin_Brake = GPIO_PIN_13;
+  _sMotorBrake.GPIO_Port_Brake = GPIOC;
 
   memset(&_sMotorHandleX , 0, sizeof(_sMotorHandleX));
   _sMotorHandleX.htim = &htim2;
@@ -154,6 +159,7 @@ int main(void)
 				  0,
 				  100,
 				  -100);
+
 //  Controller_Init(&_sControllerY,
 //		   	   	  0,
 //				  0,
@@ -190,19 +196,21 @@ uint32_t xCurrentTick = 0;
 
     /* USER CODE BEGIN 3 */
 //	  MPU6050_Calibrate(&hi2c2);
+	  xCurrentTick = HAL_GetTick();
+	  Controller_GetPIDVoltageValue(&_sControllerX, &_float_VoltageValueX);
+	  Controller_CalculateDutyCycle(_float_VoltageValueX, &_float_DutyCycleX);
+	  Motor_SetDutyCycle(&_sMotorHandleX, _float_DutyCycleX);
 
-//	  Controller_GetPIDVoltageValue(&_sControllerX, &_float_VoltageValueX);
-//	  Controller_CalculateDutyCycle(_float_VoltageValueX, &_float_DutyCycleX);
-	  if (bool)
-	  {
-		  Motor_SetDutyCycle(&_sMotorHandleX, _float_DutyCycleX);
-	  }
+//	  if (bool)
+//	  {
+//		  Motor_SetBrake(&_sMotorBrake, Enum_BrakeState);
+//		  Motor_SetDutyCycle(&_sMotorHandleX, _float_DutyCycleX);
+//	  }
 
 //	  Controller_GetPIDVoltageValue(&_sControllerY, &_float_VoltageValueY);
 //	  Controller_CalculateDutyCycle(_float_VoltageValueY, &_float_DutyCycleY);
 //	  Motor_SetDutyCycle(&_sMotorHandleY, _float_DutyCycleY);
 
-	  HAL_Delay (100);
 	  HAL_Delay (100 - (HAL_GetTick() - xCurrentTick));
   }
   /* USER CODE END 3 */
