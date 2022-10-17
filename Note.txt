@@ -5,16 +5,18 @@ PSC = (ratio/(ARR+1)) -1 = (1440/256) -1 = 5.625, rounded to 6
 Check:
 Fpwm = Fclk/(ARR+1)/(PSC+1) = 72E6 / 256 / 7 = 40.1 kHz
 
+
+
 APB1/APB2 Timer clock = Fclk = 84 MHz
-ARR = 1000 (perchè sì)
+ARR = 1680 (perchè sì)
 Frequenza PWM motori = Fpwm compresa tra 20 e 30 KHz
 
 Calcolo prescaler
 Ratio = Fclk/Fpwm = 84 MHz / 30 KHz = 2800
-Prescaler = PSC = (Ratio/(ARR+1)) -1 = (2800 / 1001) - 1 = 1,79 ≈ 2
+Prescaler = PSC = (Ratio/(ARR+1)) -1 = (2800 / 1681) - 1 = 0.67 ≈ 1
 
 Check
-Fpwm = Fclk/(ARR+1)/(PSC+1) = 84*10^6 / 1001 / 3 = 27972 ≈ 28 KHz
+Fpwm = Fclk/(ARR+1)/(PSC+1) = 84*10^6 / 1681 / 2 = 24985 ≈ 25 KHz
 
 
 

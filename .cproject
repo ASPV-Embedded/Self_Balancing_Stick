@@ -50,6 +50,7 @@
 									<listOptionValue builtIn="false" value="../Core/Hw/CubeMx/GPIO"/>
 									<listOptionValue builtIn="false" value="../Core/Hw/CubeMx/I2C"/>
 									<listOptionValue builtIn="false" value="../Core/Hw/CubeMx/TIM"/>
+									<listOptionValue builtIn="false" value="../Core/Hw/CubeMx/DMA"/>
 									<listOptionValue builtIn="false" value="../Core/Components/ENCODER"/>
 									<listOptionValue builtIn="false" value="../Core/Components/MOTOR"/>
 									<listOptionValue builtIn="false" value="../Drivers/STM32F4xx_HAL_Driver/Inc"/>

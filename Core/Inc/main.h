@@ -35,6 +35,7 @@ extern "C" {
 #include <stdlib.h>
 #include <stdint.h>
 #include <string.h>
+#include <stdio.h>
 #include <math.h>
 
 /* USER CODE END Includes */
@@ -62,12 +63,12 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
-#define CW_CCW_X_Pin GPIO_PIN_14
+#define CW_CCW_X_Pin GPIO_PIN_1
 #define CW_CCW_X_GPIO_Port GPIOC
-#define CW_CCW_Y_Pin GPIO_PIN_15
+#define CW_CCW_Y_Pin GPIO_PIN_2
 #define CW_CCW_Y_GPIO_Port GPIOC
-#define BRAKE_XY_Pin GPIO_PIN_0
-#define BRAKE_XY_GPIO_Port GPIOH
+#define BRAKE_XY_Pin GPIO_PIN_3
+#define BRAKE_XY_GPIO_Port GPIOC
 #define PWM_DCM_X_Pin GPIO_PIN_0
 #define PWM_DCM_X_GPIO_Port GPIOA
 #define PWM_DCM_Y_Pin GPIO_PIN_1
@@ -80,6 +81,12 @@ void Error_Handler(void);
 #define BAT_STATUS_GPIO_Port GPIOC
 #define IMU_SCL_Pin GPIO_PIN_10
 #define IMU_SCL_GPIO_Port GPIOB
+#define IR_DATA_Pin GPIO_PIN_6
+#define IR_DATA_GPIO_Port GPIOC
+#define OLED_SDA_Pin GPIO_PIN_9
+#define OLED_SDA_GPIO_Port GPIOC
+#define OLED_SCL_Pin GPIO_PIN_8
+#define OLED_SCL_GPIO_Port GPIOA
 #define IMU_SDA_Pin GPIO_PIN_12
 #define IMU_SDA_GPIO_Port GPIOC
 #define ENC_Y_A_Pin GPIO_PIN_6
