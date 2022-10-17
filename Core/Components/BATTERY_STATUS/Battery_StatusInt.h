@@ -14,4 +14,7 @@ uint16_t *_pVrefin_cal = VREFINT_CAL_ADDR;
 
 float _VDDA;
 
+void ADC_Select_VREFINT();
+void ADC_Select_CH14();
+
 #endif /* COMPONENTS_BATTERY_STATUS_BATTERY_STATUSINT_H_ */

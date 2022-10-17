@@ -66,3 +66,27 @@ void Battery_Status_AdcCal(ADC_HandleTypeDef *pAdcVrefintHandle)
 	_VDDA = VREFINT_CAL_VREF * (*_pVrefin_cal) / pAdcVrefintHandle->Instance->DR;/* Vrefin_cal is a binary number, VDDA in mV */
 	HAL_ADC_Stop(pAdcVrefintHandle);
 }
+
+void ADC_Select_VREFINT()
+{
+	ADC_ChannelConfTypeDef sConfig = {0};
+
+	sConfig.Channel = ADC_CHANNEL_VREFINT;
+	sConfig.Rank = 1;
+	sConfig.SamplingTime = ADC_SAMPLETIME_112CYCLES;
+	if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK) {
+		Error_Handler();
+	}
+}
+
+void ADC_Select_CH14()
+{
+	ADC_ChannelConfTypeDef sConfig = {0};
+
+	sConfig.Channel = ADC_CHANNEL_14;
+	sConfig.Rank = 1;
+	sConfig.SamplingTime = ADC_SAMPLETIME_3CYCLES;
+	if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK) {
+		Error_Handler();
+	}
+}
