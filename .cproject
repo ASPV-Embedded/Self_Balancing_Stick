@@ -24,6 +24,7 @@
 							<option id="com.st.stm32cube.ide.mcu.gnu.managedbuild.option.floatabi.873163036" name="Floating-point ABI" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.option.floatabi" useByScannerDiscovery="true" value="com.st.stm32cube.ide.mcu.gnu.managedbuild.option.floatabi.value.hard" valueType="enumerated"/>
 							<option id="com.st.stm32cube.ide.mcu.gnu.managedbuild.option.target_board.1041902669" name="Board" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.option.target_board" useByScannerDiscovery="false" value="genericBoard" valueType="string"/>
 							<option id="com.st.stm32cube.ide.mcu.gnu.managedbuild.option.defaults.935391366" name="Defaults" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.option.defaults" useByScannerDiscovery="false" value="com.st.stm32cube.ide.common.services.build.inputs.revA.1.0.5 || Debug || true || Executable || com.st.stm32cube.ide.mcu.gnu.managedbuild.option.toolchain.value.workspace || STM32F446RETx || 0 || 0 || arm-none-eabi- || ${gnu_tools_for_stm32_compiler_path} || ../Drivers/CMSIS/Include | ../Core/Inc | ../Drivers/STM32F4xx_HAL_Driver/Inc | ../Drivers/CMSIS/Device/ST/STM32F4xx/Include | ../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy ||  ||  || USE_HAL_DRIVER | STM32F446xx ||  || Drivers | Core/Startup | Core ||  ||  || ${workspace_loc:/${ProjName}/STM32F446RETX_FLASH.ld} || true || NonSecure ||  || secure_nsclib.o ||  || None || " valueType="string"/>
+							<option id="com.st.stm32cube.ide.mcu.gnu.managedbuild.option.nanoprintffloat.2126744416" name="Use float with printf from newlib-nano (-u _printf_float)" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.option.nanoprintffloat" useByScannerDiscovery="false" value="true" valueType="boolean"/>
 							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.ELF" id="com.st.stm32cube.ide.mcu.gnu.managedbuild.targetplatform.1436840317" isAbstract="false" osList="all" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.targetplatform"/>
 							<builder buildPath="${workspace_loc:/Self_Balancing_Stick}/Debug" id="com.st.stm32cube.ide.mcu.gnu.managedbuild.builder.504591179" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="Gnu Make Builder" parallelBuildOn="true" parallelizationNumber="optimal" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.builder"/>
 							<tool id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.assembler.1642752131" name="MCU GCC Assembler" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.assembler">
@@ -43,17 +44,18 @@
 								</option>
 								<option IS_BUILTIN_EMPTY="false" IS_VALUE_EMPTY="false" id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.option.includepaths.229403956" name="Include paths (-I)" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.option.includepaths" useByScannerDiscovery="false" valueType="includePath">
 									<listOptionValue builtIn="false" value="../Core/Inc"/>
-									<listOptionValue builtIn="false" value="../Core/Components/MPU6050"/>
-									<listOptionValue builtIn="false" value="../Core/Components/CONTROLLER"/>
 									<listOptionValue builtIn="false" value="../Core/Components/BATTERY_STATUS"/>
+									<listOptionValue builtIn="false" value="../Core/Components/BUZZER"/>
+									<listOptionValue builtIn="false" value="../Core/Components/CONTROLLER"/>
+									<listOptionValue builtIn="false" value="../Core/Components/DISPLAY"/>
+									<listOptionValue builtIn="false" value="../Core/Components/ENCODER"/>
+									<listOptionValue builtIn="false" value="../Core/Components/MOTOR"/>
+									<listOptionValue builtIn="false" value="../Core/Components/MPU6050"/>
 									<listOptionValue builtIn="false" value="../Core/Hw/CubeMx/ADC"/>
+									<listOptionValue builtIn="false" value="../Core/Hw/CubeMx/DMA"/>
 									<listOptionValue builtIn="false" value="../Core/Hw/CubeMx/GPIO"/>
 									<listOptionValue builtIn="false" value="../Core/Hw/CubeMx/I2C"/>
 									<listOptionValue builtIn="false" value="../Core/Hw/CubeMx/TIM"/>
-									<listOptionValue builtIn="false" value="../Core/Hw/CubeMx/DMA"/>
-									<listOptionValue builtIn="false" value="../Core/Components/ENCODER"/>
-									<listOptionValue builtIn="false" value="../Core/Components/MOTOR"/>
-									<listOptionValue builtIn="false" value="../Core/Components/BUZZER"/>
 									<listOptionValue builtIn="false" value="../Drivers/STM32F4xx_HAL_Driver/Inc"/>
 									<listOptionValue builtIn="false" value="../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy"/>
 									<listOptionValue builtIn="false" value="../Drivers/CMSIS/Device/ST/STM32F4xx/Include"/>

@@ -30,6 +30,10 @@
 #include "controller_Ext.h"
 #include "MotorExt.h"
 #include "EncoderExt.h"
+#include "Buzzer_Ext.h"
+#include "NEC_Decode.h"
+#include "ssd1306.h"
+#include "eeprom.h"
 
 /* USER CODE END Includes */
 
@@ -125,7 +129,7 @@ int main(void)
   MX_TIM8_Init();
   /* USER CODE BEGIN 2 */
 
-  /* Start timer and clear any interrupt */
+  /* Start encoder timer and clear any interrupt */
   __HAL_TIM_CLEAR_IT(&htim3, TIM_IT_UPDATE);
   __HAL_TIM_CLEAR_IT(&htim4, TIM_IT_UPDATE);
   HAL_TIM_Base_Start_IT(&htim3);
