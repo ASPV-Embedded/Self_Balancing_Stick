@@ -16,13 +16,20 @@ uint8_t MPU6050_Init(I2C_HandleTypeDef *I2Cx)
     uint8_t check = 0;
     uint8_t Data = 0;
 
+    //FIXME: remove
+    uint8_t IntPinCfg_read = 0;
+    uint8_t UserControl_read = 0;
+
     _pI2C_handle = I2Cx;
 
 //    memset(& _MPU6050_Offsets, 0, sizeof(_MPU6050_Offsets));
 
     // check device ID WHO_AM_I
-
     HAL_I2C_Mem_Read(_pI2C_handle, MPU6050_ADDR, WHO_AM_I_REG, 1, &check, 1, MPU6050_I2C_TIMEOUT);
+
+    // Read content of INT_PIN_CFG_REG and USER_CONTROL_REG
+    HAL_I2C_Mem_Read(_pI2C_handle, MPU6050_ADDR, INT_PIN_CFG_REG, 1, &IntPinCfg_read, 1, MPU6050_I2C_TIMEOUT);
+    HAL_I2C_Mem_Read(_pI2C_handle, MPU6050_ADDR, USER_CONTROL_REG, 1, &UserControl_read, 1, MPU6050_I2C_TIMEOUT);
 
     if (check == 104)  // 0x68 will be returned by the sensor if everything goes well
     {
@@ -43,6 +50,15 @@ uint8_t MPU6050_Init(I2C_HandleTypeDef *I2Cx)
         // XG_ST=0,YG_ST=0,ZG_ST=0, FS_SEL=0 -> � 250 �/s
         Data = 0x00;
         HAL_I2C_Mem_Write(_pI2C_handle, MPU6050_ADDR, GYRO_CONFIG_REG, 1, &Data, 1, MPU6050_I2C_TIMEOUT);
+
+        // Enable Auxiliary I2C bypass in INT_PIN_CFG_REG Register
+        IntPinCfg_read |= 0x02;
+        HAL_I2C_Mem_Write(_pI2C_handle, MPU6050_ADDR, INT_PIN_CFG_REG, 1, &IntPinCfg_read, 1, MPU6050_I2C_TIMEOUT);
+
+        // Disable auxiliary I2C master mode in USER_CONTROL_REG Register
+        UserControl_read |= 0x00;
+        HAL_I2C_Mem_Write(_pI2C_handle, MPU6050_ADDR, USER_CONTROL_REG, 1, &UserControl_read, 1, MPU6050_I2C_TIMEOUT);
+
         return 0;
     }
     return 1;
