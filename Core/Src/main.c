@@ -31,7 +31,7 @@
 #include "MotorExt.h"
 #include "EncoderExt.h"
 #include "Buzzer_Ext.h"
-#include "NEC_Decode.h"
+#include "Remote_Cmd_Ext.h"
 #include "ssd1306.h"
 #include "eeprom.h"
 

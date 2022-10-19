@@ -51,6 +51,7 @@
 									<listOptionValue builtIn="false" value="../Core/Components/ENCODER"/>
 									<listOptionValue builtIn="false" value="../Core/Components/MOTOR"/>
 									<listOptionValue builtIn="false" value="../Core/Components/MPU6050"/>
+									<listOptionValue builtIn="false" value="../Core/Components/REMOTE_CMD"/>
 									<listOptionValue builtIn="false" value="../Core/Hw/CubeMx/ADC"/>
 									<listOptionValue builtIn="false" value="../Core/Hw/CubeMx/DMA"/>
 									<listOptionValue builtIn="false" value="../Core/Hw/CubeMx/GPIO"/>
