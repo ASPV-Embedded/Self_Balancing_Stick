@@ -63,12 +63,12 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
-#define CW_CCW_X_Pin GPIO_PIN_1
-#define CW_CCW_X_GPIO_Port GPIOC
-#define CW_CCW_Y_Pin GPIO_PIN_2
-#define CW_CCW_Y_GPIO_Port GPIOC
-#define BRAKE_XY_Pin GPIO_PIN_3
+#define BRAKE_XY_Pin GPIO_PIN_1
 #define BRAKE_XY_GPIO_Port GPIOC
+#define CW_CCW_X_Pin GPIO_PIN_2
+#define CW_CCW_X_GPIO_Port GPIOC
+#define CW_CCW_Y_Pin GPIO_PIN_3
+#define CW_CCW_Y_GPIO_Port GPIOC
 #define PWM_DCM_X_Pin GPIO_PIN_0
 #define PWM_DCM_X_GPIO_Port GPIOA
 #define PWM_DCM_Y_Pin GPIO_PIN_1
