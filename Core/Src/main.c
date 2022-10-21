@@ -177,7 +177,7 @@ int main(void)
 									 -100));
 
   Error_Check(Error, Controller_Init(&_sControllerY,
-		   	   	  	  	  	  	  	 0,
+		   	   	  	  	  	  	  	 1,
 									 0,
 									 347,
 									 0,
