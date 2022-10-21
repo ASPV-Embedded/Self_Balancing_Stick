@@ -32,6 +32,7 @@
 #include "EncoderExt.h"
 #include "Buzzer_Ext.h"
 #include "Remote_Cmd_Ext.h"
+#include "Display_Ext.h"
 #include "ssd1306.h"
 #include "eeprom.h"
 
@@ -183,6 +184,8 @@ int main(void)
 									 100,
 									 -100));
 
+  Display_Init(&_sControllerX, &_sControllerX);
+  Remote_Cmd_Init();
 
   /* USER CODE END 2 */
 
@@ -202,6 +205,7 @@ int main(void)
 
 	  /* USER CODE BEGIN 3 */
 	  //	  MPU6050_Calibrate(&hi2c2);
+	  Display_UpdateScreen();
 
 	  Controller_GetPIDVoltageValue(&_sControllerX, &_float_VoltageValueX);
 	  Controller_CalculateDutyCycle(_float_VoltageValueX, &_float_DutyCycleX);

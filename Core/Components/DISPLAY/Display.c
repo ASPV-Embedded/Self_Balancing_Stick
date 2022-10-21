@@ -7,6 +7,14 @@
 
 #include "Display_int.h"
 
+void Display_Init(Controller_t *pControllerX, Controller_t *pControllerY)
+{
+	ssd1306_Init();
+
+	_Display_Context.psControllerX = pControllerX;
+	_Display_Context.psControllerY = pControllerY;
+}
+
 void Display_DrawOutline()
 {
 	  ssd1306_Fill(Black);
@@ -113,7 +121,7 @@ void Display_UnderlineElement(Display_Element_te Enum_ElementToUnderline, SSD130
 	}
 }
 
-void Display_UpdateScreen(/*Controller_t *pControllerX, Controller_t *pControllerY*/)
+void Display_UpdateScreen()
 {
 	Display_DrawOutline();
 	Display_UnderlineElement(_Enum_SelectedCoeff, White);
@@ -122,15 +130,17 @@ void Display_UpdateScreen(/*Controller_t *pControllerX, Controller_t *pControlle
 	switch(_Enum_SelectedController)
 	{
 	case Display_Element_1:
-//		Display_WritePidGains(pControllerX->float_Kp, pControllerX->float_Ki,
-//							  pControllerX->float_Kd, pControllerX->float_Ks);
-		Display_WritePidGains(100.1, 200.2, 300.3, 400.4);
+		Display_WritePidGains(_Display_Context.psControllerX->float_Kp,
+							  _Display_Context.psControllerX->float_Ki,
+							  _Display_Context.psControllerX->float_Kd,
+							  _Display_Context.psControllerX->float_Ks);
 		break;
 
 	case Display_Element_2:
-//		Display_WritePidGains(pControllerY->float_Kp, pControllerY->float_Ki,
-//							  pControllerY->float_Kd, pControllerY->float_Ks);
-		Display_WritePidGains(500.5, 600.6, 700.7, 800.8);
+		Display_WritePidGains(_Display_Context.psControllerY->float_Kp,
+							  _Display_Context.psControllerY->float_Ki,
+							  _Display_Context.psControllerY->float_Kd,
+							  _Display_Context.psControllerY->float_Ks);
 		break;
 
 	default:

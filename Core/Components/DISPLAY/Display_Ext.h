@@ -8,6 +8,8 @@
 #ifndef INC_DISPLAY_EXT_H_
 #define INC_DISPLAY_EXT_H_
 
+#include "Controller_Ext.h"
+
 //typedef enum
 //{
 //	Display_PidCoeff_Kp = 0,
@@ -41,7 +43,14 @@ typedef enum
 	Display_Element_Invalid
 }Display_Element_te;
 
-void Display_UpdateScreen(/*Controller_t *pControllerX, Controller_t *pControllerY*/);
+typedef struct
+{
+	Controller_t *psControllerX;
+	Controller_t *psControllerY;
+}Display_Context_ts;
+
+void Display_Init(Controller_t *pControllerX, Controller_t *pControllerY);
+void Display_UpdateScreen();
 void Display_SelectCoeff(Display_Element_te Enum_PidCoeff);
 void Display_SelectController(Display_Element_te Enum_Controller);
 Display_Element_te Display_GetSelectedController();
