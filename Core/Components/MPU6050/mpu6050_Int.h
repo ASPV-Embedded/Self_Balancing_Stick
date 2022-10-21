@@ -91,6 +91,6 @@ MPU6050_Kalman_t _KalmanY = {
 
 //////////// PRIVATE FUNCTIONS //////////////////
 
-double MPU6050_Kalman_CalculateAngle(MPU6050_Kalman_t *Kalman, double newAngle, double newRate, double dt);
+float MPU6050_Kalman_CalculateAngle(MPU6050_Kalman_t *Kalman, float newAngle, float newRate, float dt);
 
 #endif /* MPU6050_INT_H_ */

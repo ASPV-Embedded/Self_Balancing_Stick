@@ -20,27 +20,27 @@ typedef struct {
     int16_t Accel_X_RAW;
     int16_t Accel_Y_RAW;
     int16_t Accel_Z_RAW;
-    double Ax;
-    double Ay;
-    double Az;
+    float Ax;
+    float Ay;
+    float Az;
 
     int16_t Gyro_X_RAW;
     int16_t Gyro_Y_RAW;
     int16_t Gyro_Z_RAW;
-    double Gx;
-    double Gy;
-    double Gz;
+    float Gx;
+    float Gy;
+    float Gz;
 
     float Temperature;
 
-    double KalmanAngleX;
-    double KalmanAngleY;
+    float KalmanAngleX;
+    float KalmanAngleY;
 } MPU6050_Data_t;
 
 typedef struct {
 
-    double AngleX;
-    double AngleY;
+	float AngleX;
+	float AngleY;
 
 } MPU6050_Angles_t;
 

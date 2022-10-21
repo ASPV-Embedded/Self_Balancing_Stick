@@ -113,6 +113,18 @@ typedef char Bool_t;
 			}							\
 		}
 
+#define SGN(value, sign) 		\
+		{  						\
+			if (value > 0)      \
+			{                   \
+				sign = 1;       \
+			}                   \
+			else                \
+			{                   \
+				sign = -1;      \
+			}                   \
+		}
+
 /* USER CODE END Private defines */
 
 #ifdef __cplusplus

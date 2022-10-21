@@ -156,13 +156,18 @@ void MPU6050_Get_Angles(MPU6050_Angles_t *pAngles)
 	MPU6050_Read_All(&DataStruct);
 
     // Kalman angle solve
-    double dt = (double) (HAL_GetTick() - _uint32_Timer) / 1000;
+    float dt = (float) (HAL_GetTick() - _uint32_Timer) / 1000;
     _uint32_Timer = HAL_GetTick();
 
     // https://www.nxp.com/files-static/sensors/doc/app_note/AN3461.pdf
-    double roll = atan2(DataStruct.Accel_Y_RAW, DataStruct.Accel_Z_RAW) * RAD_TO_DEG;
-    double pitch;
-    double pitch_sqrt = sqrt(
+    float roll = (atan2(DataStruct.Accel_Y_RAW, DataStruct.Accel_Z_RAW) * RAD_TO_DEG);
+    int8_t int8_RollSgn;
+    SGN(roll, int8_RollSgn);
+
+    roll = roll - (int8_RollSgn * 180);
+
+    float pitch;
+    float pitch_sqrt = sqrt(
     		DataStruct.Accel_Y_RAW * DataStruct.Accel_Y_RAW + DataStruct.Accel_Z_RAW * DataStruct.Accel_Z_RAW);
     pitch = atan2(-DataStruct.Accel_X_RAW, pitch_sqrt) * RAD_TO_DEG;
 
@@ -173,9 +178,9 @@ void MPU6050_Get_Angles(MPU6050_Angles_t *pAngles)
     pAngles->AngleY = DataStruct.KalmanAngleY;
 }
 
-double MPU6050_Kalman_CalculateAngle(MPU6050_Kalman_t *Kalman, double newAngle, double newRate, double dt)
+float MPU6050_Kalman_CalculateAngle(MPU6050_Kalman_t *Kalman, float newAngle, float newRate, float dt)
 {
-    double rate = newRate - Kalman->bias;
+    float rate = newRate - Kalman->bias;
     Kalman->angle += dt * rate;
 
     Kalman->P[0][0] += dt * (dt * Kalman->P[1][1] - Kalman->P[0][1] - Kalman->P[1][0] + Kalman->Q_angle);
@@ -183,17 +188,17 @@ double MPU6050_Kalman_CalculateAngle(MPU6050_Kalman_t *Kalman, double newAngle, 
     Kalman->P[1][0] -= dt * Kalman->P[1][1];
     Kalman->P[1][1] += Kalman->Q_bias * dt;
 
-    double S = Kalman->P[0][0] + Kalman->R_measure;
-    double K[2];
+    float S = Kalman->P[0][0] + Kalman->R_measure;
+    float K[2];
     K[0] = Kalman->P[0][0] / S;
     K[1] = Kalman->P[1][0] / S;
 
-    double y = newAngle - Kalman->angle;
+    float y = newAngle - Kalman->angle;
     Kalman->angle += K[0] * y;
     Kalman->bias += K[1] * y;
 
-    double P00_temp = Kalman->P[0][0];
-    double P01_temp = Kalman->P[0][1];
+    float P00_temp = Kalman->P[0][0];
+    float P01_temp = Kalman->P[0][1];
 
     Kalman->P[0][0] -= K[0] * P00_temp;
     Kalman->P[0][1] -= K[0] * P01_temp;

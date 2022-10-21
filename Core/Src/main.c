@@ -137,7 +137,6 @@ int main(void)
   HAL_TIM_Base_Start_IT(&htim4);
 
   /* IMU initialization */
-
   //FIXME: far restituire un booleano di completamento
   while (MPU6050_Init(&hi2c2) == 1)
   {
