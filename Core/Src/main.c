@@ -153,11 +153,15 @@ int main(void)
   memset(&_sMotorHandleX , 0, sizeof(_sMotorHandleX));
   _sMotorHandleX.htim = &htim2;
   _sMotorHandleX.uint32_TimChannel = TIM_CHANNEL_1;
+  _sMotorHandleX.GPIO_Pin_SpinDirection = CW_CCW_X_Pin;
+  _sMotorHandleX.GPIO_Port_SpinDirection = CW_CCW_X_GPIO_Port;
   Motor_Init(&_sMotorHandleX, &_sMotorBrake);
 
   memset(&_sMotorHandleY , 0, sizeof(_sMotorHandleY));
   _sMotorHandleY.htim = &htim2;
   _sMotorHandleY.uint32_TimChannel = TIM_CHANNEL_2;
+  _sMotorHandleY.GPIO_Pin_SpinDirection = CW_CCW_Y_Pin;
+  _sMotorHandleY.GPIO_Port_SpinDirection = CW_CCW_Y_GPIO_Port;
   Motor_Init(&_sMotorHandleY, &_sMotorBrake);
 
   Error = Encoder_Init(htim3.Instance, htim4.Instance);
