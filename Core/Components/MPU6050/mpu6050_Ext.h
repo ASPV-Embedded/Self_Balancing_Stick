@@ -62,5 +62,7 @@ void MPU6050_Calibrate();
 
 Bool_t MPU6050_IsVertical();
 
+void MPU6050_CalculateSetPoint();
+
 #endif /* MPU6050_EXT_H_ */
 

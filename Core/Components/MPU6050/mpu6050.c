@@ -257,3 +257,27 @@ Bool_t MPU6050_IsVertical()
 	return Bool_IsVertical;
 }
 
+void MPU6050_CalculateSetPoint()
+{
+	uint8_t Enable = 1;
+	double Measures[2] = {0}; // [x, y]
+	float Mean[2] = {0};
+	int32_t i = 0;
+
+	while ((Enable == 1) && (i < MPU6050_SETPOINT_CALC_TIMEOUT))
+	{
+		MPU6050_Get_Angles(&_sAngles);
+
+		Measures[0] += _sAngles.AngleX; // x
+		Measures[1] += _sAngles.AngleY; // y
+
+		i++;
+		HAL_Delay (10);
+	}
+
+	Mean[0] = Measures[0] / i;
+	Mean[1] = Measures[1] / i;
+
+	Enable = 0;
+}
+

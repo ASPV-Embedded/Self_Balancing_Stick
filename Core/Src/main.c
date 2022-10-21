@@ -207,7 +207,8 @@ int main(void)
 	  /* USER CODE END WHILE */
 
 	  /* USER CODE BEGIN 3 */
-	  //	  MPU6050_Calibrate(&hi2c2);
+	  //	  MPU6050_Calibrate();
+//	  MPU6050_CalculateSetPoint();
 	  Display_UpdateScreen();
 
 	  Controller_GetPIDVoltageValue(&_sControllerX, &_float_VoltageValueX);

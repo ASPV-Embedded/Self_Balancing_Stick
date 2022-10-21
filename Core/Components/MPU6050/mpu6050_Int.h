@@ -34,6 +34,8 @@
 // Imu sample rate = 1KHz, each clock tick is 1 ms, so 3*10^6 ms = 5 min.
 #define MPU6050_CALIBRATION_TIMEOUT (300000)
 
+#define MPU6050_SETPOINT_CALC_TIMEOUT (1000)
+
 #define MPU6050_I2C_TIMEOUT  (100)
 
 #define MPU6050_VERTICAL_THRESHOLD	 (float)3 //[°]
@@ -67,6 +69,8 @@ typedef struct {
 uint32_t _uint32_Timer;
 
 I2C_HandleTypeDef *_pI2C_handle;
+
+MPU6050_Angles_t _sAngles;
 
 MPU6050_Offsets_t _MPU6050_Offsets = {
 		.Offset_Accel_X = 1449,
