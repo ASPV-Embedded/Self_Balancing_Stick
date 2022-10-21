@@ -188,7 +188,7 @@ int main(void)
 									 -100));
 
   Display_Init(&_sControllerX, &_sControllerX);
-  Remote_Cmd_Init();
+  Remote_Cmd_Init(&_sMotorBrake);
 
   /* USER CODE END 2 */
 

@@ -8,22 +8,24 @@
 #include "Remote_Cmd_Int.h"
 #include "Display_Ext.h"
 
-void Remote_Cmd_Init()
+void Remote_Cmd_Init(Motor_Brake_t *psMotorBrake)
 {
-	_sNecParams.timerHandle = &htim8;
+	_sRemote_Cmd_Context.sNecParams.timerHandle = &htim8;
 
-	_sNecParams.timerChannel = TIM_CHANNEL_1;
-	_sNecParams.timerChannelActive = HAL_TIM_ACTIVE_CHANNEL_1;
+	_sRemote_Cmd_Context.sNecParams.timerChannel = TIM_CHANNEL_1;
+	_sRemote_Cmd_Context.sNecParams.timerChannelActive = HAL_TIM_ACTIVE_CHANNEL_1;
 
-	_sNecParams.timingBitBoundary = 1680;
-	_sNecParams.timingAgcBoundary = 12500;
-	_sNecParams.type = NEC_NOT_EXTENDED;
+	_sRemote_Cmd_Context.sNecParams.timingBitBoundary = 1680;
+	_sRemote_Cmd_Context.sNecParams.timingAgcBoundary = 12500;
+	_sRemote_Cmd_Context.sNecParams.type = NEC_NOT_EXTENDED;
 
-	_sNecParams.NEC_DecodedCallback = Remote_Cmd_NecDecodedCallback;
-	_sNecParams.NEC_ErrorCallback = Remote_Cmd_NecErrorCallback;
-	_sNecParams.NEC_RepeatCallback = Remote_Cmd_NecRepeatCallback;
+	_sRemote_Cmd_Context.sNecParams.NEC_DecodedCallback = Remote_Cmd_NecDecodedCallback;
+	_sRemote_Cmd_Context.sNecParams.NEC_ErrorCallback = Remote_Cmd_NecErrorCallback;
+	_sRemote_Cmd_Context.sNecParams.NEC_RepeatCallback = Remote_Cmd_NecRepeatCallback;
 
-	NEC_Read(&_sNecParams);
+	_sRemote_Cmd_Context.psMotorBrake = psMotorBrake;
+
+	NEC_Read(&_sRemote_Cmd_Context.sNecParams);
 }
 
 void Remote_Cmd_OnCmdReceived(uint8_t uint8_Cmd)
@@ -32,6 +34,14 @@ void Remote_Cmd_OnCmdReceived(uint8_t uint8_Cmd)
 	{
 	case 0x45:
 		/* "POWER" */
+		if (_sRemote_Cmd_Context.psMotorBrake->Enum_BrakeState == BRAKE_OFF)
+		{
+			Motor_SetBrake(_sRemote_Cmd_Context.psMotorBrake, BRAKE_ON);
+		}
+		else if (_sRemote_Cmd_Context.psMotorBrake->Enum_BrakeState == BRAKE_ON)
+		{
+			Motor_SetBrake(_sRemote_Cmd_Context.psMotorBrake, BRAKE_OFF);
+		}
 		break;
 
 	case 0x47:
@@ -167,27 +177,27 @@ void Remote_Cmd_OnCmdReceived(uint8_t uint8_Cmd)
 void Remote_Cmd_NecDecodedCallback(uint16_t uint16_Address, uint8_t uint8_Cmd)
 {
 	Remote_Cmd_OnCmdReceived(uint8_Cmd);
-    NEC_Read(&_sNecParams);
+    NEC_Read(&_sRemote_Cmd_Context.sNecParams);
 }
 
 void Remote_Cmd_NecErrorCallback()
 {
 	// char* msg = "Error!\n";
 	// HAL_UART_Transmit_DMA(&huart3, (uint8_t*) msg, strlen(msg));
-    NEC_Read(&_sNecParams);
+    NEC_Read(&_sRemote_Cmd_Context.sNecParams);
 }
 
 void Remote_Cmd_NecRepeatCallback()
 {
 	// char* msg = "Repeat!\n";
 	// HAL_UART_Transmit_DMA(&huart3, (uint8_t*) msg, strlen(msg));
-    NEC_Read(&_sNecParams);
+    NEC_Read(&_sRemote_Cmd_Context.sNecParams);
 }
 
 void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
 {
 	if (htim == &htim8)
 	{
-        NEC_TIM_IC_CaptureCallback(&_sNecParams);
+        NEC_TIM_IC_CaptureCallback(&_sRemote_Cmd_Context.sNecParams);
     }
 }

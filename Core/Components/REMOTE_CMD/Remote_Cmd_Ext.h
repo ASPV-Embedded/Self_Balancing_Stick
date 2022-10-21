@@ -8,6 +8,8 @@
 #ifndef COMPONENTS_REMOTE_CMD_REMOTE_CMD_EXT_H_
 #define COMPONENTS_REMOTE_CMD_REMOTE_CMD_EXT_H_
 
-void Remote_Cmd_Init();
+#include "MotorExt.h"
+
+void Remote_Cmd_Init(Motor_Brake_t *psMotorBrake);
 
 #endif /* COMPONENTS_REMOTE_CMD_REMOTE_CMD_EXT_H_ */

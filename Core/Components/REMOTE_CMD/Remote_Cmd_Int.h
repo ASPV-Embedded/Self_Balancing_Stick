@@ -12,7 +12,14 @@
 #include "NEC_Decode.h"
 #include "tim.h"
 
-NEC _sNecParams;
+typedef struct
+{
+	NEC sNecParams;
+	Motor_Brake_t *psMotorBrake;
+
+}Remote_Cmd_Context_ts;
+
+Remote_Cmd_Context_ts _sRemote_Cmd_Context = {0};
 
 float value = 350.1;
 
