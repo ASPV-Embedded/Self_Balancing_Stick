@@ -23,7 +23,7 @@ typedef enum
 typedef struct
 {
 	ControllerAxis_te Enum_ControllerAxis;
-	int32_t int32_PID_Voltage;
+	float float_PIDValue;
 
 	float float_Kp;
 	float float_Ki;
@@ -39,6 +39,8 @@ typedef struct
 	float float_StictionSpeedThreshold;  // RPM
 	float float_FrictionValue;
 
+	uint32_t uint32_LastTick;
+
 } Controller_t;
 
 Error_t Controller_Init(Controller_t *psController,
@@ -52,7 +54,7 @@ Error_t Controller_Init(Controller_t *psController,
 						float float_angle_Integral_Max,
 						float float_angle_Integral_Min);
 
-Error_t Controller_GetPIDVoltageValue(Controller_t *psController, float *pfloat_VoltageValue);
+Error_t Controller_GetPIDVoltageValue(uint32_t uint32_CurrentTick, Controller_t *psController, float *pfloat_VoltageValue);
 
 Error_t Controller_CalculateDutyCycle(float pfloat_VoltageValue, float *pfloat_DutyCycle);
 

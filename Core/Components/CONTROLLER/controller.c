@@ -56,7 +56,8 @@ Error_t Controller_Init(Controller_t *psController,
 
 		psController->float_AngleIntegralError = 0;
 		psController->float_LastError = 0;
-		psController->int32_PID_Voltage = 0;
+		psController->uint32_LastTick = 0;
+		psController->float_PIDValue = 0;
 
 	}
 	return Error;
@@ -67,14 +68,15 @@ Error_t Controller_Init(Controller_t *psController,
  * @param psController - Controller structure
  * @param pfloat_VoltageValue - PID output value
  */
-Error_t Controller_GetPIDVoltageValue(Controller_t *psController, float *pfloat_VoltageValue)
+Error_t Controller_GetPIDVoltageValue(uint32_t uint32_CurrentTick, Controller_t *psController, float *pfloat_VoltageValue)
 {
 	Error_t Error = E_OK;
 
 	MPU6050_Angles_t sAngles;
-	static float float_AngleNow = 0;
+	static float float_CurrentAngle = 0;
 	float float_AngleError = 0;
 	float float_AngleDerivativeError = 0;
+	float float_DeltaT = 0;
 	float float_WheelSpeed = 0;
 //	float float_friction = 0;
 
@@ -82,12 +84,12 @@ Error_t Controller_GetPIDVoltageValue(Controller_t *psController, float *pfloat_
 
 	if (CONTROLLER_AXIS_X == psController->Enum_ControllerAxis)
 	{
-		float_AngleNow = sAngles.AngleX;
+		float_CurrentAngle = sAngles.AngleX;
 		Encoder_GetEncoderSpeed(ENCODER_X, &float_WheelSpeed);
 	}
 	else if (CONTROLLER_AXIS_Y == psController->Enum_ControllerAxis)
 	{
-		float_AngleNow = sAngles.AngleY;
+		float_CurrentAngle = sAngles.AngleY;
 		Encoder_GetEncoderSpeed(ENCODER_Y, &float_WheelSpeed);
 	}
 	else
@@ -98,10 +100,14 @@ Error_t Controller_GetPIDVoltageValue(Controller_t *psController, float *pfloat_
 	if (E_OK == Error)
 	{
 		// calculate angle error
-		float_AngleError = psController->float_AngleSetpoint - float_AngleNow;
+		float_AngleError = psController->float_AngleSetpoint - float_CurrentAngle;
+
+		// calculate DeltaT [s]
+		float_DeltaT = (float)(uint32_CurrentTick - psController->uint32_LastTick) / 1000;
+		psController->uint32_LastTick = uint32_CurrentTick;
 
 		// integral angle error
-		psController->float_AngleIntegralError += float_AngleError; //* uint32_deltaTime / 1000000.0;
+		psController->float_AngleIntegralError += (float_AngleError * float_DeltaT);
 
 		// Integral wind-up control
 		if (psController->float_AngleIntegralError > psController->float_AngleIntegralMax)
@@ -114,14 +120,14 @@ Error_t Controller_GetPIDVoltageValue(Controller_t *psController, float *pfloat_
 		}
 
 		// derivative angle error
-		float_AngleDerivativeError = float_AngleError - psController->float_LastError;
+		float_AngleDerivativeError = (float_AngleError - psController->float_LastError) / float_DeltaT;
 		psController->float_LastError = float_AngleError;
 
-		float P_Accel = psController->float_Kp * float_AngleError;
-		float I_Accel = psController->float_Ki * psController->float_AngleIntegralError;
-		float D_Accel = psController->float_Kd * float_AngleDerivativeError;
-		float S_Accel = psController->float_Ks * float_WheelSpeed;
-		float PID_Accel = P_Accel + I_Accel + D_Accel + S_Accel;
+		float float_PropValue = psController->float_Kp * float_AngleError;
+		float float_IntValue = psController->float_Ki * psController->float_AngleIntegralError;
+		float float_DerivValue = psController->float_Kd * float_AngleDerivativeError;
+//		float S_Accel = psController->float_Ks * float_WheelSpeed;
+		psController->float_PIDValue = float_PropValue + float_IntValue + float_DerivValue;// + S_Accel;
 
 //		// friction_Value is applied at low speeds
 //		if ((float_WheelSpeed * RAD_S_TO_RPM_CONVERSION_FACTOR) > psController->float_StictionSpeedThreshold)
@@ -133,7 +139,7 @@ Error_t Controller_GetPIDVoltageValue(Controller_t *psController, float *pfloat_
 //			float_friction = -psController->float_FrictionValue;
 //		}
 
-		*pfloat_VoltageValue = (PID_Accel);
+		*pfloat_VoltageValue = psController->float_PIDValue;
 	}
 
 	return Error;
