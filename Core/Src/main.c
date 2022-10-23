@@ -97,7 +97,7 @@ int main(void)
   /* USER CODE BEGIN 1 */
   Error_t Error = E_OK;
   uint32_t xCurrentTick = 0;
-  Motor_BrakeState_te Enum_BrakeState = BRAKE_OFF;
+  Motor_BrakeState_te Enum_BrakeState = BRAKE_ON;
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -207,17 +207,19 @@ int main(void)
 	  /* USER CODE END WHILE */
 
 	  /* USER CODE BEGIN 3 */
-	  //	  MPU6050_Calibrate();
+	  xCurrentTick = HAL_GetTick();
+
+//	  MPU6050_Calibrate();
 //	  MPU6050_CalculateSetPoint();
 	  Display_UpdateScreen();
 
-	  Controller_GetPIDVoltageValue(&_sControllerX, &_float_VoltageValueX);
+	  Controller_GetPIDVoltageValue(xCurrentTick, &_sControllerX, &_float_VoltageValueX);
 	  Controller_CalculateDutyCycle(_float_VoltageValueX, &_float_DutyCycleX);
-	  Motor_SetDutyCycle(&_sMotorHandleX, -(_float_DutyCycleX));
+	  Motor_SetDutyCycle(&_sMotorHandleX, _float_DutyCycleX);
 
-	  Controller_GetPIDVoltageValue(&_sControllerY, &_float_VoltageValueY);
+	  Controller_GetPIDVoltageValue(xCurrentTick, &_sControllerY, &_float_VoltageValueY);
 	  Controller_CalculateDutyCycle(_float_VoltageValueY, &_float_DutyCycleY);
-	  Motor_SetDutyCycle(&_sMotorHandleY, _float_DutyCycleY);
+	  Motor_SetDutyCycle(&_sMotorHandleY, -(_float_DutyCycleY));
 
 	  HAL_Delay (100 - (HAL_GetTick() - xCurrentTick));
   }
