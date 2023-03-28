@@ -11,6 +11,7 @@
 
 /*
  * @brief initializes a new controller object
+ * @param psController - Controller instance
  * @param Enum_ControllerAxis - The direction associated with this controller, x or y
  * @param float_AngleSetpoint - Set point
  * @param float_Kp - PID imu proportional gain
@@ -123,6 +124,7 @@ Error_t Controller_GetPIDVoltageValue(uint32_t uint32_CurrentTick, Controller_t 
 		float_AngleDerivativeError = (float_AngleError - psController->float_LastError) / float_DeltaT;
 		psController->float_LastError = float_AngleError;
 
+		// calculation of Proportional, Integral and Derivative actions
 		float float_PropValue = psController->float_Kp * float_AngleError;
 		float float_IntValue = psController->float_Ki * psController->float_AngleIntegralError;
 		float float_DerivValue = psController->float_Kd * float_AngleDerivativeError;

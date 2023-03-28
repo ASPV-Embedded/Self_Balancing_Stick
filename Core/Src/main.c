@@ -137,7 +137,6 @@ int main(void)
   HAL_TIM_Base_Start_IT(&htim4);
 
   /* IMU initialization */
-  //FIXME: far restituire un booleano di completamento
   while (MPU6050_Init(&hi2c2) == 1)
   {
 	  HAL_Delay (100);
@@ -151,43 +150,48 @@ int main(void)
   /* Motor initialization */
   memset(&_sMotorHandleX , 0, sizeof(_sMotorHandleX));
   _sMotorHandleX.htim = &htim2;
-  _sMotorHandleX.uint32_TimChannel = TIM_CHANNEL_1;
-  _sMotorHandleX.GPIO_Pin_SpinDirection = CW_CCW_X_Pin;
-  _sMotorHandleX.GPIO_Port_SpinDirection = CW_CCW_X_GPIO_Port;
+  _sMotorHandleX.uint32_TimChannel = TIM_CHANNEL_2;
+  _sMotorHandleX.GPIO_Pin_SpinDirection = CW_CCW_Y_Pin;
+  _sMotorHandleX.GPIO_Port_SpinDirection = CW_CCW_Y_GPIO_Port;
   Motor_Init(&_sMotorHandleX, &_sMotorBrake);
 
   memset(&_sMotorHandleY , 0, sizeof(_sMotorHandleY));
   _sMotorHandleY.htim = &htim2;
-  _sMotorHandleY.uint32_TimChannel = TIM_CHANNEL_2;
-  _sMotorHandleY.GPIO_Pin_SpinDirection = CW_CCW_Y_Pin;
-  _sMotorHandleY.GPIO_Port_SpinDirection = CW_CCW_Y_GPIO_Port;
+  _sMotorHandleY.uint32_TimChannel = TIM_CHANNEL_1;
+  _sMotorHandleY.GPIO_Pin_SpinDirection = CW_CCW_X_Pin;
+  _sMotorHandleY.GPIO_Port_SpinDirection = CW_CCW_X_GPIO_Port;
   Motor_Init(&_sMotorHandleY, &_sMotorBrake);
 
+  /* Encoder initialization */
   Error = Encoder_Init(htim3.Instance, htim4.Instance);
 
-  Error_Check(Error, Controller_Init(&_sControllerX,
-		   	   	  	  	  	  	  	 0,
-									 0,
-									 347,
-									 0,
-									 77.1,
-									 1,
-									 0,
-									 100,
-									 -100));
+  /* Controller initialization*/
+  Error_Check(Error, Controller_Init(&_sControllerX,	//controller instance
+		  	  	  	  	  	  	  	 CONTROLLER_AXIS_X, // direction
+									 0,					// set point
+									 300,				// Kp
+									 20,                // Ki
+									 0,					// Kd
+									 1,					// Ks (not used)
+									 0,					// friction (not used)
+									 10,				// max positive value of Integral action (wind up prevention)
+									 -10));				// max negative value of Integral action (wind up prevention)
 
-  Error_Check(Error, Controller_Init(&_sControllerY,
-		   	   	  	  	  	  	  	 1,
-									 0,
-									 347,
-									 0,
-									 77.1,
-									 1,
-									 0,
-									 100,
-									 -100));
+  Error_Check(Error, Controller_Init(&_sControllerY,	//controller instance
+		  	  	  	  	  	  	  	 CONTROLLER_AXIS_Y,	// direction
+									 0,					// set point
+									 300,				// Kp
+									 20,				// Ki
+									 0,					// Kd
+									 1,					// Ks (not used)
+									 0,					// friction (not used)
+									 10,				// max positive value of Integral action (wind up prevention)
+									 -10));				// max negative value of Integral action (wind up prevention)
 
-  Display_Init(&_sControllerX, &_sControllerX);
+  /* OLED display initialization */
+  Display_Init(&_sControllerX, &_sControllerY);
+
+  /* Remote command module initialization */
   Remote_Cmd_Init(&_sMotorBrake);
 
   /* USER CODE END 2 */
@@ -200,6 +204,7 @@ int main(void)
   {
 	  HAL_Delay (100);
   }
+  /* Toggle brake ON */
   Motor_SetBrake(&_sMotorBrake, Enum_BrakeState);
 
   while (1)
@@ -209,19 +214,28 @@ int main(void)
 	  /* USER CODE BEGIN 3 */
 	  xCurrentTick = HAL_GetTick();
 
+	  /* IMU Utility function, uncomment if necessary */
+	  /* Calculation of Accellerometer and Gyroscope offsets, need to be hard-coded manually after calibration */
 //	  MPU6050_Calibrate();
+
+	  /* Calculation of set point, need to be hard-coded manually after calibration */
 //	  MPU6050_CalculateSetPoint();
+
+	  /* Periodic update of OLED display to show updated info */
 	  Display_UpdateScreen();
 
+	  /* Controller_X routine */
 	  Controller_GetPIDVoltageValue(xCurrentTick, &_sControllerX, &_float_VoltageValueX);
 	  Controller_CalculateDutyCycle(_float_VoltageValueX, &_float_DutyCycleX);
-	  Motor_SetDutyCycle(&_sMotorHandleX, _float_DutyCycleX);
+	  Motor_SetDutyCycle(&_sMotorHandleX, -(_float_DutyCycleX));
 
+	  /* Controller_Y routine */
 	  Controller_GetPIDVoltageValue(xCurrentTick, &_sControllerY, &_float_VoltageValueY);
 	  Controller_CalculateDutyCycle(_float_VoltageValueY, &_float_DutyCycleY);
-	  Motor_SetDutyCycle(&_sMotorHandleY, -(_float_DutyCycleY));
+	  Motor_SetDutyCycle(&_sMotorHandleY, _float_DutyCycleY);
 
-	  HAL_Delay (100 - (HAL_GetTick() - xCurrentTick));
+	  /* Sampling Time */
+	  HAL_Delay (1);// - (HAL_GetTick() - xCurrentTick));
   }
   /* USER CODE END 3 */
 }

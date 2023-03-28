@@ -80,7 +80,7 @@ Motor_Status_te Motor_SetSpinDirection(Motor_Handle_t *psMotorHandle, Motor_Stat
 	}
 	else
 	{
-		/*Stop the motor from PWM (set dc to 0)*/
+		/*Stop the motor from PWM (set duty cycle to 0)*/
 		__HAL_TIM_SET_COMPARE(psMotorHandle->htim, psMotorHandle->uint32_TimChannel, ARR_VALUE);
 		/* Immediate update */
 		psMotorHandle->htim->Instance->EGR = TIM_EGR_UG;

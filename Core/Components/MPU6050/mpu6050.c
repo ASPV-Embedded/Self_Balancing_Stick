@@ -174,8 +174,11 @@ void MPU6050_Get_Angles(MPU6050_Angles_t *pAngles)
     DataStruct.KalmanAngleX = MPU6050_Kalman_CalculateAngle(&_KalmanX, roll, DataStruct.Gx, dt);
     DataStruct.KalmanAngleY = MPU6050_Kalman_CalculateAngle(&_KalmanY, pitch, DataStruct.Gy, dt);
 
-    pAngles->AngleX = DataStruct.KalmanAngleX;
-    pAngles->AngleY = DataStruct.KalmanAngleY;
+    pAngles->AngleX = DataStruct.KalmanAngleX - (-0.227661534);
+    pAngles->AngleY = DataStruct.KalmanAngleY -  (1.318527222);
+
+    _sAngles.AngleX = pAngles->AngleX;
+    _sAngles.AngleY = pAngles->AngleY;
 }
 
 float MPU6050_Kalman_CalculateAngle(MPU6050_Kalman_t *Kalman, float newAngle, float newRate, float dt)

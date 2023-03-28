@@ -28,3 +28,29 @@ Offset Accelerazione Z = 862;
 Offset Giroscopio X = -362;
 Offset Giroscopio Y = -345;
 Offset Giroscopio Z = -174;
+
+
+/////////////////// Idee
+
+- Capire bontà degli angoli x e y in uscita dal filtro di kalman:
+	Effettuare test con goniometro digitale (tipo quello che ci fece vedere Racanelli in lab) e vedere se corrispondono 
+	le misure fatte col goniometro con quelle viste in debug in uscita al filtro di kalman 
+	Per visualizzare i valori in debug, inserire nelle "Live Expressions" le due variabili globali _sAngles.AngleX e _sAngles.AngleY in mpu6050.c (riga 180 e 181) 
+	Eventualmente, se non ci sono problemi e gli angoli misurati sono giusti, capire quanto ci mette il filtro di kalman a convergere al valore misurato col goniometro
+	e capire se è troppo lento o no. 
+	
+- Implementare anche il filtro complementare e comparare i risultati di bontà e "tempo di convergenza/assestamento" o com cazz s chieum
+	Fare un'altra funzione, simile a MPU6050_Kalman_CalculateAngle
+	
+- Valutare se è necessario implementare un meccanismo di aggiustamento automatico del Set Point 
+	In tutti gli altri progetti che abbiamo preso come esempio c'è questa cosa ma noi non l'abbiamo mai cacata più di tanto. Noi impostiamo 0,0 come 
+	set point, ma in realtà la posizione in cui tutto il sistema è in equilibrio non è quella, in quanto i pesi non sono "simmetrici" rispetto alla verticale.
+	Nel video che ci fece vedere il professore si vede il caso in cui il tipo aggiunge un pesetto ad una ruota e il set point si aggiusta di conseguenza, dato
+	che la posizione di equilibrio è cambiata.
+	In qualche progetto che avevo scaricato c'era fatta una roba del genere
+	
+- Taratura del PID (come ultima cosa proprio)
+	I valori di Kp, Ki e Kd che sto usando attualmente fanno sì che la risposta sia abbastanza forte anche per piccole variazioni di angolo (dopo uno 
+	scostamento di tipo 2-3° dal set point già arrivo a pilotare i motori col 100% del duty cycle) 
+	Una volta che siamo sicuri che gli angoli sono misurati correttamente e "rapidamente" va tarato il PID. Qua, oltre ad andare trial and error a modificare
+	i valori che stanno impostati, chiederei supporto a Racanelli/De Cicco

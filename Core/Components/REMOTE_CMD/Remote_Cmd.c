@@ -182,15 +182,11 @@ void Remote_Cmd_NecDecodedCallback(uint16_t uint16_Address, uint8_t uint8_Cmd)
 
 void Remote_Cmd_NecErrorCallback()
 {
-	// char* msg = "Error!\n";
-	// HAL_UART_Transmit_DMA(&huart3, (uint8_t*) msg, strlen(msg));
     NEC_Read(&_sRemote_Cmd_Context.sNecParams);
 }
 
 void Remote_Cmd_NecRepeatCallback()
 {
-	// char* msg = "Repeat!\n";
-	// HAL_UART_Transmit_DMA(&huart3, (uint8_t*) msg, strlen(msg));
     NEC_Read(&_sRemote_Cmd_Context.sNecParams);
 }
 
