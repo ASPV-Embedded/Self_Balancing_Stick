@@ -237,14 +237,14 @@ int main(void)
 	  /* Controller_X routine */
 	  Controller_GetPIDVoltageValue(xRoutineStartTick, sAngles, &_sControllerX, &_float_VoltageValueX);
 	  Controller_CalculateDutyCycle(_float_VoltageValueX, &_float_DutyCycleX);
-	  Motor_SetDutyCycle(&_sMotorHandleX, -(_float_DutyCycleX));
+	  Motor_SetDutyCycle(&_sMotorHandleX, _float_DutyCycleX);
 
 	  xRoutineNow = HAL_GetTick();
 
 	  /* Controller_Y routine */
 	  Controller_GetPIDVoltageValue(xRoutineNow, sAngles, &_sControllerY, &_float_VoltageValueY);
 	  Controller_CalculateDutyCycle(_float_VoltageValueY, &_float_DutyCycleY);
-	  Motor_SetDutyCycle(&_sMotorHandleY, _float_DutyCycleY);
+	  Motor_SetDutyCycle(&_sMotorHandleY, -(_float_DutyCycleY));
 
 	  /* Sampling Time */
 	  xRoutineEndTick = HAL_GetTick();
