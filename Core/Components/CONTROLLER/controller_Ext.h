@@ -54,7 +54,8 @@ Error_t Controller_Init(Controller_t *psController,
 						float float_angle_Integral_Max,
 						float float_angle_Integral_Min);
 
-Error_t Controller_GetPIDVoltageValue(uint32_t uint32_CurrentTick, Controller_t *psController, float *pfloat_VoltageValue);
+Error_t Controller_GetPIDVoltageValue(uint32_t uint32_CurrentTick, MPU6050_Angles_t sAngles,
+									  Controller_t *psController, float *pfloat_VoltageValue);
 
 Error_t Controller_CalculateDutyCycle(float pfloat_VoltageValue, float *pfloat_DutyCycle);
 

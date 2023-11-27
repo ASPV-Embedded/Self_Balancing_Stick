@@ -96,8 +96,12 @@ int main(void)
 {
   /* USER CODE BEGIN 1 */
   Error_t Error = E_OK;
-  uint32_t xCurrentTick = 0;
+  uint32_t xRoutineStartTick = 0;
+  uint32_t xRoutineEndTick = 0;
+  uint32_t xRoutineElapsedTime = 0;
+  uint32_t xRoutineNow = 0;
   Motor_BrakeState_te Enum_BrakeState = BRAKE_ON;
+  MPU6050_Angles_t sAngles;
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -212,7 +216,7 @@ int main(void)
 	  /* USER CODE END WHILE */
 
 	  /* USER CODE BEGIN 3 */
-	  xCurrentTick = HAL_GetTick();
+	  xRoutineStartTick = HAL_GetTick();
 
 	  /* IMU Utility function, uncomment if necessary */
 	  /* Calculation of Accellerometer and Gyroscope offsets, need to be hard-coded manually after calibration */
@@ -222,20 +226,30 @@ int main(void)
 //	  MPU6050_CalculateSetPoint();
 
 	  /* Periodic update of OLED display to show updated info */
-	  Display_UpdateScreen();
+//	  Display_UpdateScreen();
+
+	  xRoutineNow = HAL_GetTick();
+
+	  MPU6050_Get_Angles(&sAngles);
+
+	  xRoutineNow = HAL_GetTick();
 
 	  /* Controller_X routine */
-	  Controller_GetPIDVoltageValue(xCurrentTick, &_sControllerX, &_float_VoltageValueX);
+	  Controller_GetPIDVoltageValue(xRoutineStartTick, sAngles, &_sControllerX, &_float_VoltageValueX);
 	  Controller_CalculateDutyCycle(_float_VoltageValueX, &_float_DutyCycleX);
 	  Motor_SetDutyCycle(&_sMotorHandleX, -(_float_DutyCycleX));
 
+	  xRoutineNow = HAL_GetTick();
+
 	  /* Controller_Y routine */
-	  Controller_GetPIDVoltageValue(xCurrentTick, &_sControllerY, &_float_VoltageValueY);
+	  Controller_GetPIDVoltageValue(xRoutineNow, sAngles, &_sControllerY, &_float_VoltageValueY);
 	  Controller_CalculateDutyCycle(_float_VoltageValueY, &_float_DutyCycleY);
 	  Motor_SetDutyCycle(&_sMotorHandleY, _float_DutyCycleY);
 
 	  /* Sampling Time */
-	  HAL_Delay (1);// - (HAL_GetTick() - xCurrentTick));
+	  xRoutineEndTick = HAL_GetTick();
+	  xRoutineElapsedTime = xRoutineEndTick - xRoutineStartTick;
+	  HAL_Delay (20 - xRoutineElapsedTime);
   }
   /* USER CODE END 3 */
 }

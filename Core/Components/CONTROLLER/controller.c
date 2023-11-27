@@ -69,19 +69,17 @@ Error_t Controller_Init(Controller_t *psController,
  * @param psController - Controller structure
  * @param pfloat_VoltageValue - PID output value
  */
-Error_t Controller_GetPIDVoltageValue(uint32_t uint32_CurrentTick, Controller_t *psController, float *pfloat_VoltageValue)
+Error_t Controller_GetPIDVoltageValue(uint32_t uint32_CurrentTick, MPU6050_Angles_t sAngles,
+									  Controller_t *psController, float *pfloat_VoltageValue)
 {
 	Error_t Error = E_OK;
 
-	MPU6050_Angles_t sAngles;
 	static float float_CurrentAngle = 0;
 	float float_AngleError = 0;
 	float float_AngleDerivativeError = 0;
 	float float_DeltaT = 0;
 	float float_WheelSpeed = 0;
 //	float float_friction = 0;
-
-	MPU6050_Get_Angles(&sAngles);
 
 	if (CONTROLLER_AXIS_X == psController->Enum_ControllerAxis)
 	{
