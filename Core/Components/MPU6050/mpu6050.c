@@ -38,7 +38,11 @@ uint8_t MPU6050_Init(I2C_HandleTypeDef *I2Cx)
         HAL_I2C_Mem_Write(_pI2C_handle, MPU6050_ADDR, PWR_MGMT_1_REG, 1, &Data, 1, MPU6050_I2C_TIMEOUT);
 
         // Set DATA RATE of 1KHz by writing SMPLRT_DIV register
+        // DATA RATE = (GYRO_OutputDataRate / 1 + SMPLRT_DIV) con GYRO_OutputDataRate = 8KHz
+        // To set 1KHz -> SMPLRT_DIV = 7 (0x07h)
+        // To set 50Hz (20ms) -> SMPLRT_DIV = 159 (0x9Fh)
         Data = 0x07;
+        //Data = 0x09F;
         HAL_I2C_Mem_Write(_pI2C_handle, MPU6050_ADDR, SMPLRT_DIV_REG, 1, &Data, 1, MPU6050_I2C_TIMEOUT);
 
         // Set accelerometer configuration in ACCEL_CONFIG Register
@@ -134,7 +138,7 @@ void MPU6050_Read_All(MPU6050_Data_t *pDataStruct)
 
     pDataStruct->Accel_X_RAW = (int16_t) (Rec_Data[0] << 8 | Rec_Data[1]) - _MPU6050_Offsets.Offset_Accel_X;
     pDataStruct->Accel_Y_RAW = (int16_t) (Rec_Data[2] << 8 | Rec_Data[3]) - _MPU6050_Offsets.Offset_Accel_Y;
-    pDataStruct->Accel_Z_RAW = (int16_t) (Rec_Data[4] << 8 | Rec_Data[5]) - _MPU6050_Offsets.Offset_Accel_Z;
+    pDataStruct->Accel_Z_RAW = (int16_t) (Rec_Data[4] << 8 | Rec_Data[5]) + _MPU6050_Offsets.Offset_Accel_Z;
     temp = (int16_t) (Rec_Data[6] << 8 | Rec_Data[7]);
     pDataStruct->Gyro_X_RAW = (int16_t) (Rec_Data[8] << 8 | Rec_Data[9]) - _MPU6050_Offsets.Offset_Gyro_X;
     pDataStruct->Gyro_Y_RAW = (int16_t) (Rec_Data[10] << 8 | Rec_Data[11]) - _MPU6050_Offsets.Offset_Gyro_Y;
@@ -142,7 +146,7 @@ void MPU6050_Read_All(MPU6050_Data_t *pDataStruct)
 
     pDataStruct->Ax = pDataStruct->Accel_X_RAW / 16384.0;
     pDataStruct->Ay = pDataStruct->Accel_Y_RAW / 16384.0;
-    pDataStruct->Az = pDataStruct->Accel_Z_RAW / 16384.0;//Accel_Z_corrector;
+    pDataStruct->Az = pDataStruct->Accel_Z_RAW / 16384.0; //_Accel_Z_corrector;
     pDataStruct->Temperature = (float) ((int16_t) temp / (float) 340.0 + (float) 36.53);
     pDataStruct->Gx = pDataStruct->Gyro_X_RAW / 131.0;
     pDataStruct->Gy = pDataStruct->Gyro_Y_RAW / 131.0;
@@ -152,11 +156,12 @@ void MPU6050_Read_All(MPU6050_Data_t *pDataStruct)
 
 void MPU6050_Get_Angles(MPU6050_Angles_t *pAngles)
 {
+	_uint32_Now = HAL_GetTick();
 	MPU6050_Data_t DataStruct;
 	MPU6050_Read_All(&DataStruct);
 
     // Kalman angle solve
-    float dt = (float) (HAL_GetTick() - _uint32_Timer) / 1000;
+    float dt = (float) (_uint32_Now - _uint32_Timer) / 1000;
     _uint32_Timer = HAL_GetTick();
 
     // https://www.nxp.com/files-static/sensors/doc/app_note/AN3461.pdf
@@ -174,8 +179,8 @@ void MPU6050_Get_Angles(MPU6050_Angles_t *pAngles)
     DataStruct.KalmanAngleX = MPU6050_Kalman_CalculateAngle(&_KalmanX, roll, DataStruct.Gx, dt);
     DataStruct.KalmanAngleY = MPU6050_Kalman_CalculateAngle(&_KalmanY, pitch, DataStruct.Gy, dt);
 
-    pAngles->AngleX = DataStruct.KalmanAngleX - (-0.227661534);
-    pAngles->AngleY = DataStruct.KalmanAngleY -  (1.318527222);
+    pAngles->AngleX = DataStruct.KalmanAngleX;// - (-0.227661534);
+    pAngles->AngleY = DataStruct.KalmanAngleY;// -  (1.318527222);
 
     _sAngles.AngleX = pAngles->AngleX;
     _sAngles.AngleY = pAngles->AngleY;

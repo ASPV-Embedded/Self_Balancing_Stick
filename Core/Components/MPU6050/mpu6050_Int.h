@@ -64,9 +64,10 @@ typedef struct {
 
 //////////// PRIVATE VARIABLES //////////////////
 
-//const double Accel_Z_corrector = 14418.0;
+const double _Accel_Z_corrector = 14418.0;
 
 uint32_t _uint32_Timer;
+uint32_t _uint32_Now;
 
 I2C_HandleTypeDef *_pI2C_handle;
 
