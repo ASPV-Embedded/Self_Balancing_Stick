@@ -95,7 +95,7 @@ Error_t Encoder_GetEncoderSpeed(Encoder_te Enum_Encoder, float *pfloat_Speed)
 	return Error;
 }
 
-void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+void Encoder_InterruptCallback(TIM_HandleTypeDef *htim)
 {
 	if (htim == &htim3)
 	{

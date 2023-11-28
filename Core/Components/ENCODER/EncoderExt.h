@@ -35,6 +35,6 @@ typedef enum
 Error_t Encoder_Init(TIM_TypeDef *pTim3Handle, TIM_TypeDef *pTim4Handle);
 Error_t Encoder_GetEncoderSpeed(Encoder_te Enum_Encoder, float *pfloat_Speed);
 
-void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim);
+void Encoder_InterruptCallback(TIM_HandleTypeDef *htim);
 
 #endif /* __ENCODEREXT_H_ */

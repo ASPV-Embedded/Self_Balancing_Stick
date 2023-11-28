@@ -80,6 +80,7 @@ Motor_Brake_t _sMotorBrake;
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim);
 
 /* USER CODE END PFP */
 
@@ -132,6 +133,8 @@ int main(void)
   MX_ADC1_Init();
   MX_I2C3_Init();
   MX_TIM8_Init();
+  MX_TIM11_Init();
+  MX_TIM12_Init();
   /* USER CODE BEGIN 2 */
 
   /* Start encoder timer and clear any interrupt */
@@ -303,6 +306,14 @@ void SystemClock_Config(void)
 
 /* USER CODE BEGIN 4 */
 
+
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+{
+	if ((htim == &htim3) || (htim == &htim4))
+	{
+		Encoder_InterruptCallback(htim);
+	}
+}
 /* USER CODE END 4 */
 
 /**
