@@ -127,63 +127,86 @@ void MPU6050_Read_Temp(MPU6050_Data_t *pDataStruct)
     pDataStruct->Temperature = (float) ((int16_t) temp / (float) 340.0 + (float) 36.53);
 }
 
-void MPU6050_Read_All(MPU6050_Data_t *pDataStruct)
+void MPU6050_Read_All()
 {
-    uint8_t Rec_Data[14];
-    int16_t temp;
+	HAL_StatusTypeDef HAL_Error = HAL_OK;
 
     // Read 14 BYTES of data starting from ACCEL_XOUT_H register
+    HAL_Error = HAL_I2C_Mem_Read_IT(_pI2C_handle, MPU6050_ADDR, ACCEL_XOUT_H_REG, 1, _vMPU6050_RxBuffer, 14);
 
-    HAL_I2C_Mem_Read(_pI2C_handle, MPU6050_ADDR, ACCEL_XOUT_H_REG, 1, Rec_Data, 14, MPU6050_I2C_TIMEOUT);
+    if (HAL_OK == HAL_Error)
+    {
+    	/* Forward I2C read "state machine" */
+        _BOOL_MPU6050_ReadReqDone = TRUE;
+    }
 
-    pDataStruct->Accel_X_RAW = (int16_t) (Rec_Data[0] << 8 | Rec_Data[1]) - _MPU6050_Offsets.Offset_Accel_X;
-    pDataStruct->Accel_Y_RAW = (int16_t) (Rec_Data[2] << 8 | Rec_Data[3]) - _MPU6050_Offsets.Offset_Accel_Y;
-    pDataStruct->Accel_Z_RAW = (int16_t) (Rec_Data[4] << 8 | Rec_Data[5]) + _MPU6050_Offsets.Offset_Accel_Z;
-    temp = (int16_t) (Rec_Data[6] << 8 | Rec_Data[7]);
-    pDataStruct->Gyro_X_RAW = (int16_t) (Rec_Data[8] << 8 | Rec_Data[9]) - _MPU6050_Offsets.Offset_Gyro_X;
-    pDataStruct->Gyro_Y_RAW = (int16_t) (Rec_Data[10] << 8 | Rec_Data[11]) - _MPU6050_Offsets.Offset_Gyro_Y;
-    pDataStruct->Gyro_Z_RAW = (int16_t) (Rec_Data[12] << 8 | Rec_Data[13]) - _MPU6050_Offsets.Offset_Gyro_Z;
+}
 
-    pDataStruct->Ax = pDataStruct->Accel_X_RAW / 16384.0;
-    pDataStruct->Ay = pDataStruct->Accel_Y_RAW / 16384.0;
-    pDataStruct->Az = pDataStruct->Accel_Z_RAW / 16384.0; //_Accel_Z_corrector;
-    pDataStruct->Temperature = (float) ((int16_t) temp / (float) 340.0 + (float) 36.53);
-    pDataStruct->Gx = pDataStruct->Gyro_X_RAW / 131.0;
-    pDataStruct->Gy = pDataStruct->Gyro_Y_RAW / 131.0;
-    pDataStruct->Gz = pDataStruct->Gyro_Z_RAW / 131.0;
+void HAL_I2C_MemRxCpltCallback(I2C_HandleTypeDef *hi2c)
+{
+    int16_t temp;
+    _sMPU6050_Data.Accel_X_RAW = (int16_t) (_vMPU6050_RxBuffer[0] << 8 | _vMPU6050_RxBuffer[1]) - _MPU6050_Offsets.Offset_Accel_X;
+    _sMPU6050_Data.Accel_Y_RAW = (int16_t) (_vMPU6050_RxBuffer[2] << 8 | _vMPU6050_RxBuffer[3]) - _MPU6050_Offsets.Offset_Accel_Y;
+    _sMPU6050_Data.Accel_Z_RAW = (int16_t) (_vMPU6050_RxBuffer[4] << 8 | _vMPU6050_RxBuffer[5]) + _MPU6050_Offsets.Offset_Accel_Z;
+    temp = (int16_t) (_vMPU6050_RxBuffer[6] << 8 | _vMPU6050_RxBuffer[7]);
+    _sMPU6050_Data.Gyro_X_RAW = (int16_t) (_vMPU6050_RxBuffer[8] << 8 | _vMPU6050_RxBuffer[9]) - _MPU6050_Offsets.Offset_Gyro_X;
+    _sMPU6050_Data.Gyro_Y_RAW = (int16_t) (_vMPU6050_RxBuffer[10] << 8 | _vMPU6050_RxBuffer[11]) - _MPU6050_Offsets.Offset_Gyro_Y;
+    _sMPU6050_Data.Gyro_Z_RAW = (int16_t) (_vMPU6050_RxBuffer[12] << 8 | _vMPU6050_RxBuffer[13]) - _MPU6050_Offsets.Offset_Gyro_Z;
+
+    _sMPU6050_Data.Ax = _sMPU6050_Data.Accel_X_RAW / 16384.0;
+    _sMPU6050_Data.Ay = _sMPU6050_Data.Accel_Y_RAW / 16384.0;
+    _sMPU6050_Data.Az = _sMPU6050_Data.Accel_Z_RAW / 16384.0; //_Accel_Z_corrector;
+    _sMPU6050_Data.Temperature = (float) ((int16_t) temp / (float) 340.0 + (float) 36.53);
+    _sMPU6050_Data.Gx = _sMPU6050_Data.Gyro_X_RAW / 131.0;
+    _sMPU6050_Data.Gy = _sMPU6050_Data.Gyro_Y_RAW / 131.0;
+    _sMPU6050_Data.Gz = _sMPU6050_Data.Gyro_Z_RAW / 131.0;
+
+    _BOOL_MPU6050_NewDataReceived = TRUE;
 
 }
 
 void MPU6050_Get_Angles(MPU6050_Angles_t *pAngles)
 {
 	_uint32_Now = HAL_GetTick();
-	MPU6050_Data_t DataStruct;
-	MPU6050_Read_All(&DataStruct);
 
-    // Kalman angle solve
-    float dt = (float) (_uint32_Now - _uint32_Timer) / 1000;
-    _uint32_Timer = HAL_GetTick();
+	if (FALSE == _BOOL_MPU6050_ReadReqDone)
+	{
+		MPU6050_Read_All();
+	}
+	else
+	{
+		if (TRUE == _BOOL_MPU6050_NewDataReceived)
+		{
+			// Kalman angle solve
+			float float_DeltaT = (float) (_uint32_Now - _uint32_Timer) / 1000;
+			_uint32_Timer = HAL_GetTick();
 
-    // https://www.nxp.com/files-static/sensors/doc/app_note/AN3461.pdf
-    float roll = (atan2(DataStruct.Accel_Y_RAW, DataStruct.Accel_Z_RAW) * RAD_TO_DEG);
-    int8_t int8_RollSgn;
-    SGN(roll, int8_RollSgn);
+			// https://www.nxp.com/files-static/sensors/doc/app_note/AN3461.pdf
+			float roll = (atan2(_sMPU6050_Data.Accel_Y_RAW, _sMPU6050_Data.Accel_Z_RAW) * RAD_TO_DEG);
+			int8_t int8_RollSgn;
+			SGN(roll, int8_RollSgn);
 
-    roll = roll - (int8_RollSgn * 180);
+			roll = roll - (int8_RollSgn * 180);
 
-    float pitch;
-    float pitch_sqrt = sqrt(
-    		DataStruct.Accel_Y_RAW * DataStruct.Accel_Y_RAW + DataStruct.Accel_Z_RAW * DataStruct.Accel_Z_RAW);
-    pitch = atan2(-DataStruct.Accel_X_RAW, pitch_sqrt) * RAD_TO_DEG;
+			float pitch;
+			float pitch_sqrt = sqrt(
+					_sMPU6050_Data.Accel_Y_RAW * _sMPU6050_Data.Accel_Y_RAW + _sMPU6050_Data.Accel_Z_RAW * _sMPU6050_Data.Accel_Z_RAW);
+			pitch = atan2(-_sMPU6050_Data.Accel_X_RAW, pitch_sqrt) * RAD_TO_DEG;
 
-    DataStruct.KalmanAngleX = MPU6050_Kalman_CalculateAngle(&_KalmanX, roll, DataStruct.Gx, dt);
-    DataStruct.KalmanAngleY = MPU6050_Kalman_CalculateAngle(&_KalmanY, pitch, DataStruct.Gy, dt);
+			_sMPU6050_Data.KalmanAngleX = MPU6050_Kalman_CalculateAngle(&_KalmanX, roll, _sMPU6050_Data.Gx, float_DeltaT);
+			_sMPU6050_Data.KalmanAngleY = MPU6050_Kalman_CalculateAngle(&_KalmanY, pitch, _sMPU6050_Data.Gy, float_DeltaT);
 
-    pAngles->AngleX = DataStruct.KalmanAngleX;// - (-0.227661534);
-    pAngles->AngleY = DataStruct.KalmanAngleY;// -  (1.318527222);
+			pAngles->AngleX = _sMPU6050_Data.KalmanAngleX;
+			pAngles->AngleY = _sMPU6050_Data.KalmanAngleY;
 
-    _sAngles.AngleX = pAngles->AngleX;
-    _sAngles.AngleY = pAngles->AngleY;
+			_sAngles.AngleX = pAngles->AngleX;
+			_sAngles.AngleY = pAngles->AngleY;
+
+			/* Reset "state machine" variables */
+			_BOOL_MPU6050_ReadReqDone = FALSE;
+			_BOOL_MPU6050_NewDataReceived = FALSE;
+		}
+	}
 }
 
 float MPU6050_Kalman_CalculateAngle(MPU6050_Kalman_t *Kalman, float newAngle, float newRate, float dt)

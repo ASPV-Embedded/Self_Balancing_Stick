@@ -71,6 +71,13 @@ uint32_t _uint32_Now;
 
 I2C_HandleTypeDef *_pI2C_handle;
 
+uint8_t _vMPU6050_RxBuffer[14];
+MPU6050_Data_t _sMPU6050_Data;
+
+/* For i2c read operation */
+volatile Bool_t _BOOL_MPU6050_ReadReqDone = FALSE;
+volatile Bool_t _BOOL_MPU6050_NewDataReceived = FALSE;
+
 MPU6050_Angles_t _sAngles;
 
 MPU6050_Offsets_t _MPU6050_Offsets = {

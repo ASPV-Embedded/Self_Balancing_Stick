@@ -54,7 +54,7 @@ void MPU6050_Read_Gyro(MPU6050_Data_t *pDataStruct);
 
 void MPU6050_Read_Temp(MPU6050_Data_t *pDataStruct);
 
-void MPU6050_Read_All(MPU6050_Data_t *pDataStruct);
+void MPU6050_Read_All();
 
 void MPU6050_Get_Angles(MPU6050_Angles_t *pAngles);
 
@@ -63,6 +63,8 @@ void MPU6050_Calibrate();
 Bool_t MPU6050_IsVertical();
 
 void MPU6050_CalculateSetPoint();
+
+//void HAL_I2C_MemRxCpltCallback();
 
 #endif /* MPU6050_EXT_H_ */
 

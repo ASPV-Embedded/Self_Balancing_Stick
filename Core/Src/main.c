@@ -56,9 +56,6 @@
 
 /* USER CODE BEGIN PV */
 
-/* IMU section */
-MPU6050_Data_t _sMPU6050_Data;
-
 /* Controller section*/
 Controller_t _sControllerX;
 Controller_t _sControllerY;
@@ -73,7 +70,15 @@ Motor_Handle_t _sMotorHandleY;
 float _float_VoltageValueY = 0;
 float _float_DutyCycleY = 0;
 
+/* Tick variables */
+uint32_t _xRoutineStartTick = 0;
+uint32_t _xRoutineEndTick = 0;
+uint32_t _xRoutineElapsedTime = 0;
+uint32_t _xRoutineNow = 0;
+
 Motor_Brake_t _sMotorBrake;
+
+MPU6050_Angles_t _sMain_Angles;
 
 /* USER CODE END PV */
 
@@ -81,7 +86,7 @@ Motor_Brake_t _sMotorBrake;
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim);
-
+void Main_ControlLoop();
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -97,12 +102,7 @@ int main(void)
 {
   /* USER CODE BEGIN 1 */
   Error_t Error = E_OK;
-  uint32_t xRoutineStartTick = 0;
-  uint32_t xRoutineEndTick = 0;
-  uint32_t xRoutineElapsedTime = 0;
-  uint32_t xRoutineNow = 0;
   Motor_BrakeState_te Enum_BrakeState = BRAKE_ON;
-  MPU6050_Angles_t sAngles;
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -149,6 +149,9 @@ int main(void)
 	  HAL_Delay (100);
   }
 
+  /* Start IMU sample loop timer */
+  HAL_TIM_Base_Start_IT(&htim11);
+
   /* Brake structure initialization */
   _sMotorBrake.Enum_BrakeState = BRAKE_OFF;
   _sMotorBrake.GPIO_Pin_Brake = BRAKE_XY_Pin;
@@ -176,24 +179,24 @@ int main(void)
   Error_Check(Error, Controller_Init(&_sControllerX,	//controller instance
 		  	  	  	  	  	  	  	 CONTROLLER_AXIS_X, // direction
 									 0,					// set point
-									 300,				// Kp
-									 20,                // Ki
+									 100,				// Kp
+									 2,                	// Ki
 									 0,					// Kd
 									 1,					// Ks (not used)
 									 0,					// friction (not used)
-									 10,				// max positive value of Integral action (wind up prevention)
-									 -10));				// max negative value of Integral action (wind up prevention)
+									 100,				// max positive value of Integral action (wind up prevention)
+									 -100));			// max negative value of Integral action (wind up prevention)
 
   Error_Check(Error, Controller_Init(&_sControllerY,	//controller instance
 		  	  	  	  	  	  	  	 CONTROLLER_AXIS_Y,	// direction
 									 0,					// set point
-									 300,				// Kp
-									 20,				// Ki
+									 100,				// Kp
+									 2,					// Ki
 									 0,					// Kd
 									 1,					// Ks (not used)
 									 0,					// friction (not used)
-									 10,				// max positive value of Integral action (wind up prevention)
-									 -10));				// max negative value of Integral action (wind up prevention)
+									 100,				// max positive value of Integral action (wind up prevention)
+									 -100));			// max negative value of Integral action (wind up prevention)
 
   /* OLED display initialization */
   Display_Init(&_sControllerX, &_sControllerY);
@@ -214,45 +217,15 @@ int main(void)
   /* Toggle brake ON */
   Motor_SetBrake(&_sMotorBrake, Enum_BrakeState);
 
+  /* Start Control loop timer */
+  HAL_TIM_Base_Start_IT(&htim12);
+
   while (1)
   {
-	  /* USER CODE END WHILE */
+    /* USER CODE END WHILE */
 
-	  /* USER CODE BEGIN 3 */
-	  xRoutineStartTick = HAL_GetTick();
-
-	  /* IMU Utility function, uncomment if necessary */
-	  /* Calculation of Accellerometer and Gyroscope offsets, need to be hard-coded manually after calibration */
-//	  MPU6050_Calibrate();
-
-	  /* Calculation of set point, need to be hard-coded manually after calibration */
-//	  MPU6050_CalculateSetPoint();
-
-	  /* Periodic update of OLED display to show updated info */
-//	  Display_UpdateScreen();
-
-	  xRoutineNow = HAL_GetTick();
-
-	  MPU6050_Get_Angles(&sAngles);
-
-	  xRoutineNow = HAL_GetTick();
-
-	  /* Controller_X routine */
-	  Controller_GetPIDVoltageValue(xRoutineStartTick, sAngles, &_sControllerX, &_float_VoltageValueX);
-	  Controller_CalculateDutyCycle(_float_VoltageValueX, &_float_DutyCycleX);
-	  Motor_SetDutyCycle(&_sMotorHandleX, _float_DutyCycleX);
-
-	  xRoutineNow = HAL_GetTick();
-
-	  /* Controller_Y routine */
-	  Controller_GetPIDVoltageValue(xRoutineNow, sAngles, &_sControllerY, &_float_VoltageValueY);
-	  Controller_CalculateDutyCycle(_float_VoltageValueY, &_float_DutyCycleY);
-	  Motor_SetDutyCycle(&_sMotorHandleY, -(_float_DutyCycleY));
-
-	  /* Sampling Time */
-	  xRoutineEndTick = HAL_GetTick();
-	  xRoutineElapsedTime = xRoutineEndTick - xRoutineStartTick;
-	  HAL_Delay (20 - xRoutineElapsedTime);
+    /* USER CODE BEGIN 3 */
+	  asm("NOP");
   }
   /* USER CODE END 3 */
 }
@@ -306,12 +279,52 @@ void SystemClock_Config(void)
 
 /* USER CODE BEGIN 4 */
 
+void Main_ControlLoop()
+{
+	  _xRoutineStartTick = HAL_GetTick();
+
+	  /* IMU Utility function, uncomment if necessary */
+	  /* Calculation of Accelerometer and Gyroscope offsets, need to be hard-coded manually after calibration */
+//	  MPU6050_Calibrate();
+
+	  /* Calculation of set point, need to be hard-coded manually after calibration */
+//	  MPU6050_CalculateSetPoint();
+
+	  /* Periodic update of OLED display to show updated info */
+//	  Display_UpdateScreen();
+
+	  /* Controller_X routine */
+	  Controller_GetPIDVoltageValue(_xRoutineStartTick, _sMain_Angles, &_sControllerX, &_float_VoltageValueX);
+	  Controller_CalculateDutyCycle(_float_VoltageValueX, &_float_DutyCycleX);
+	  Motor_SetDutyCycle(&_sMotorHandleX, _float_DutyCycleX);
+
+	  _xRoutineNow = HAL_GetTick();
+
+	  /* Controller_Y routine */
+	  Controller_GetPIDVoltageValue(_xRoutineNow, _sMain_Angles, &_sControllerY, &_float_VoltageValueY);
+	  Controller_CalculateDutyCycle(_float_VoltageValueY, &_float_DutyCycleY);
+	  Motor_SetDutyCycle(&_sMotorHandleY, -(_float_DutyCycleY));
+
+	  /* Sampling Time */
+	  _xRoutineEndTick = HAL_GetTick();
+	  _xRoutineElapsedTime = _xRoutineEndTick - _xRoutineStartTick;
+}
 
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
 	if ((htim == &htim3) || (htim == &htim4))
 	{
 		Encoder_InterruptCallback(htim);
+	}
+	/* TIM11 - IMU sample loop */
+	else if (htim == &htim11)
+	{
+		MPU6050_Get_Angles(&_sMain_Angles);
+	}
+	/* TIM12 - Control loop */
+	else if (htim == &htim12)
+	{
+		Main_ControlLoop();
 	}
 }
 /* USER CODE END 4 */
