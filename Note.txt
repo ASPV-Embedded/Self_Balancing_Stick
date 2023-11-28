@@ -19,6 +19,17 @@ Check
 Fpwm = Fclk/(ARR+1)/(PSC+1) = 84*10^6 / 1681 / 2 = 24985 ≈ 25 KHz
 
 
+Frequenza campionamento IMU = 1 KHz
+Clock sistema = 21 MHz (APB2)
+Prescaler = 1
+Fimu = Fclk/(ARR+1)/(PSC+1)
+ARR = (Fclk/Fimu/(PSC+1)) - 1 = 10499
+
+Frequenza Control Loop = 20 Hz
+Clock sistema = 84 MHz (APB1)
+Prescaler = 99
+Fcl = Fclk/(ARR+1)/(PSC+1)
+ARR = (Fclk/Fcl/(PSC+1)) - 1 = 41999
 
 /////////////////// OFFSET IMU
 
