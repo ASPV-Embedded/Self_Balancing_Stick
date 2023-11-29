@@ -167,6 +167,9 @@ void HAL_I2C_MemRxCpltCallback(I2C_HandleTypeDef *hi2c)
 
 void MPU6050_Get_Angles(MPU6050_Angles_t *pAngles)
 {
+	float float_DeltaT, float_Roll, float_Pitch, float_PitchSqrt = 0;
+	int8_t int8_RollSgn;
+
 	_uint32_Now = HAL_GetTick();
 
 	if (FALSE == _BOOL_MPU6050_ReadReqDone)
@@ -177,27 +180,49 @@ void MPU6050_Get_Angles(MPU6050_Angles_t *pAngles)
 	{
 		if (TRUE == _BOOL_MPU6050_NewDataReceived)
 		{
-			// Kalman angle solve
-			float float_DeltaT = (float) (_uint32_Now - _uint32_Timer) / 1000;
-			_uint32_Timer = HAL_GetTick();
+			// Roll and Pitch angle solve
+			float_DeltaT = (float)(_uint32_Now - _uint32_LastAngleCalc) / 1000;
 
-			// https://www.nxp.com/files-static/sensors/doc/app_note/AN3461.pdf
-			float roll = (atan2(_sMPU6050_Data.Accel_Y_RAW, _sMPU6050_Data.Accel_Z_RAW) * RAD_TO_DEG);
-			int8_t int8_RollSgn;
-			SGN(roll, int8_RollSgn);
+			/* Update timer */
+			_uint32_LastAngleCalc = HAL_GetTick();
 
-			roll = roll - (int8_RollSgn * 180);
+			// https://www.nxp.com/docs/en/application-note/AN3461.pdf
+			float_Roll = (atan2(_sMPU6050_Data.Ay, _sMPU6050_Data.Az) * RAD_TO_DEG);
+			SGN(float_Roll, int8_RollSgn);
 
-			float pitch;
-			float pitch_sqrt = sqrt(
-					_sMPU6050_Data.Accel_Y_RAW * _sMPU6050_Data.Accel_Y_RAW + _sMPU6050_Data.Accel_Z_RAW * _sMPU6050_Data.Accel_Z_RAW);
-			pitch = atan2(-_sMPU6050_Data.Accel_X_RAW, pitch_sqrt) * RAD_TO_DEG;
+			float_Roll = float_Roll - (int8_RollSgn * 180);
 
-			_sMPU6050_Data.KalmanAngleX = MPU6050_Kalman_CalculateAngle(&_KalmanX, roll, _sMPU6050_Data.Gx, float_DeltaT);
-			_sMPU6050_Data.KalmanAngleY = MPU6050_Kalman_CalculateAngle(&_KalmanY, pitch, _sMPU6050_Data.Gy, float_DeltaT);
+			float_PitchSqrt = sqrt(_sMPU6050_Data.Ay * _sMPU6050_Data.Ay + _sMPU6050_Data.Az * _sMPU6050_Data.Az);
+			float_Pitch = atan2(-_sMPU6050_Data.Ax, float_PitchSqrt) * RAD_TO_DEG;
+
+#if (MPU6050_ANGLE_CALCULATION_ALGORITHM == 0) // Only accelerometer data
+
+			pAngles->AngleX = float_Roll;
+			pAngles->AngleY = float_Pitch;
+
+#elif (MPU6050_ANGLE_CALCULATION_ALGORITHM == 1) // Complementary filter
+
+			float float_RollRate, float_PitchRate, float_PitchRateSqrt = 0;
+			int8_t int8_RollRateSgn;
+
+			float_RollRate = (atan2(_sMPU6050_Data.Gy, _sMPU6050_Data.Gz) * RAD_TO_DEG);
+			SGN(float_RollRate, int8_RollRateSgn);
+
+			float_RollRate = float_RollRate - (int8_RollRateSgn * 180);
+
+			float_PitchRateSqrt = sqrt(_sMPU6050_Data.Gy * _sMPU6050_Data.Gy + _sMPU6050_Data.Gz * _sMPU6050_Data.Gz);
+			float_PitchRate = atan2(-_sMPU6050_Data.Gx, float_PitchRateSqrt) * RAD_TO_DEG;
+
+			pAngles->AngleX = (ALPHA)*(pAngles->AngleX + float_RollRate*float_DeltaT) + (1 - ALPHA)*float_Roll;
+			pAngles->AngleY = (ALPHA)*(pAngles->AngleY + float_PitchRate*float_DeltaT) + (1 - ALPHA)*float_Pitch;
+
+#elif (MPU6050_ANGLE_CALCULATION_ALGORITHM == 2) // Kalman filter
+			_sMPU6050_Data.KalmanAngleX = MPU6050_Kalman_CalculateAngle(&_KalmanX, float_Roll, _sMPU6050_Data.Gx, float_DeltaT);
+			_sMPU6050_Data.KalmanAngleY = MPU6050_Kalman_CalculateAngle(&_KalmanY, float_Pitch, _sMPU6050_Data.Gy, float_DeltaT);
 
 			pAngles->AngleX = _sMPU6050_Data.KalmanAngleX;
 			pAngles->AngleY = _sMPU6050_Data.KalmanAngleY;
+#endif
 
 			_sAngles.AngleX = pAngles->AngleX;
 			_sAngles.AngleY = pAngles->AngleY;

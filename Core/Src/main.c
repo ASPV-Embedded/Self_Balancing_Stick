@@ -78,7 +78,7 @@ uint32_t _xRoutineNow = 0;
 
 Motor_Brake_t _sMotorBrake;
 
-MPU6050_Angles_t _sMain_Angles;
+MPU6050_Angles_t _sMain_Angles = {0};
 
 /* USER CODE END PV */
 

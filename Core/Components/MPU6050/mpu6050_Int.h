@@ -40,6 +40,17 @@
 
 #define MPU6050_VERTICAL_THRESHOLD	 (float)3 //[°]
 
+/*
+ * MPU6050_ANGLE_CALCULATION_ALGORITHM defines the algorithm used to calculate roll and pitch
+ * 0 = Use only accelerometer data
+ * 1 = Complementary filter
+ * 2 = Kalman filter
+ */
+#define MPU6050_ANGLE_CALCULATION_ALGORITHM		1
+
+/* Weight for complementary filter */
+#define ALPHA 0.98
+
 // MPU6050 offsets
 typedef struct {
 
@@ -66,7 +77,7 @@ typedef struct {
 
 const double _Accel_Z_corrector = 14418.0;
 
-uint32_t _uint32_Timer;
+uint32_t _uint32_LastAngleCalc;
 uint32_t _uint32_Now;
 
 I2C_HandleTypeDef *_pI2C_handle;
