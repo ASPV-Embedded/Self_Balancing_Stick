@@ -16,6 +16,7 @@ typedef struct
 {
 	NEC sNecParams;
 	Motor_Brake_t *psMotorBrake;
+	Bool_t *pBool_IsControlLoopEnabled;
 
 }Remote_Cmd_Context_ts;
 

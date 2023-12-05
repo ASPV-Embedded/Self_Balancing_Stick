@@ -78,6 +78,8 @@ uint32_t _xRoutineNow = 0;
 
 Motor_Brake_t _sMotorBrake;
 
+Bool_t _Bool_IsControlLoopEnabled = FALSE;
+
 MPU6050_Angles_t _sMain_Angles = {0};
 
 /* USER CODE END PV */
@@ -118,8 +120,8 @@ int main(void)
   SystemClock_Config();
 
   /* USER CODE BEGIN SysInit */
+  HAL_Delay (1000);
   memset(&hi2c2, 0x0, sizeof(hi2c2));
-
   /* USER CODE END SysInit */
 
   /* Initialize all configured peripherals */
@@ -202,7 +204,7 @@ int main(void)
   Display_Init(&_sControllerX, &_sControllerY);
 
   /* Remote command module initialization */
-  Remote_Cmd_Init(&_sMotorBrake);
+  Remote_Cmd_Init(&_sMotorBrake, &_Bool_IsControlLoopEnabled);
 
   /* USER CODE END 2 */
 
@@ -281,33 +283,36 @@ void SystemClock_Config(void)
 
 void Main_ControlLoop()
 {
-	  _xRoutineStartTick = HAL_GetTick();
+	_xRoutineStartTick = HAL_GetTick();
 
-	  /* IMU Utility function, uncomment if necessary */
-	  /* Calculation of Accelerometer and Gyroscope offsets, need to be hard-coded manually after calibration */
-//	  MPU6050_Calibrate();
+	if (_Bool_IsControlLoopEnabled == TRUE)
+	{
+		/* IMU Utility function, uncomment if necessary */
+		/* Calculation of Accelerometer and Gyroscope offsets, need to be hard-coded manually after calibration */
+		//	  MPU6050_Calibrate();
 
-	  /* Calculation of set point, need to be hard-coded manually after calibration */
-//	  MPU6050_CalculateSetPoint();
+		/* Calculation of set point, need to be hard-coded manually after calibration */
+		//	  MPU6050_CalculateSetPoint();
 
-	  /* Periodic update of OLED display to show updated info */
-//	  Display_UpdateScreen();
+		/* Periodic update of OLED display to show updated info */
+		//	  Display_UpdateScreen();
 
-	  /* Controller_X routine */
-	  Controller_GetPIDVoltageValue(_xRoutineStartTick, _sMain_Angles, &_sControllerX, &_float_VoltageValueX);
-	  Controller_CalculateDutyCycle(_float_VoltageValueX, &_float_DutyCycleX);
-	  Motor_SetDutyCycle(&_sMotorHandleX, _float_DutyCycleX);
+		/* Controller_X routine */
+		Controller_GetPIDVoltageValue(_xRoutineStartTick, _sMain_Angles, &_sControllerX, &_float_VoltageValueX);
+		Controller_CalculateDutyCycle(&_sControllerX, _float_VoltageValueX, &_float_DutyCycleX);
+		Motor_SetDutyCycle(&_sMotorHandleX, _float_DutyCycleX);
 
-	  _xRoutineNow = HAL_GetTick();
+		_xRoutineNow = HAL_GetTick();
 
-	  /* Controller_Y routine */
-	  Controller_GetPIDVoltageValue(_xRoutineNow, _sMain_Angles, &_sControllerY, &_float_VoltageValueY);
-	  Controller_CalculateDutyCycle(_float_VoltageValueY, &_float_DutyCycleY);
-	  Motor_SetDutyCycle(&_sMotorHandleY, -(_float_DutyCycleY));
+		/* Controller_Y routine */
+		Controller_GetPIDVoltageValue(_xRoutineNow, _sMain_Angles, &_sControllerY, &_float_VoltageValueY);
+		Controller_CalculateDutyCycle(&_sControllerY, _float_VoltageValueY, &_float_DutyCycleY);
+		Motor_SetDutyCycle(&_sMotorHandleY, -(_float_DutyCycleY));
 
-	  /* Sampling Time */
-	  _xRoutineEndTick = HAL_GetTick();
-	  _xRoutineElapsedTime = _xRoutineEndTick - _xRoutineStartTick;
+		/* Sampling Time */
+		_xRoutineEndTick = HAL_GetTick();
+		_xRoutineElapsedTime = _xRoutineEndTick - _xRoutineStartTick;
+	}
 }
 
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)

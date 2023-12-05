@@ -8,7 +8,7 @@
 #include "Remote_Cmd_Int.h"
 #include "Display_Ext.h"
 
-void Remote_Cmd_Init(Motor_Brake_t *psMotorBrake)
+void Remote_Cmd_Init(Motor_Brake_t *psMotorBrake, Bool_t *pBool_IsControlLoopEnabled)
 {
 	_sRemote_Cmd_Context.sNecParams.timerHandle = &htim8;
 
@@ -24,6 +24,7 @@ void Remote_Cmd_Init(Motor_Brake_t *psMotorBrake)
 	_sRemote_Cmd_Context.sNecParams.NEC_RepeatCallback = Remote_Cmd_NecRepeatCallback;
 
 	_sRemote_Cmd_Context.psMotorBrake = psMotorBrake;
+	_sRemote_Cmd_Context.pBool_IsControlLoopEnabled = pBool_IsControlLoopEnabled;
 
 	NEC_Read(&_sRemote_Cmd_Context.sNecParams);
 }
@@ -170,6 +171,7 @@ void Remote_Cmd_OnCmdReceived(uint8_t uint8_Cmd)
 
 	case 0x4a:
 		/* "9" */
+		*_sRemote_Cmd_Context.pBool_IsControlLoopEnabled = !(*_sRemote_Cmd_Context.pBool_IsControlLoopEnabled);
 		break;
 	}
 }

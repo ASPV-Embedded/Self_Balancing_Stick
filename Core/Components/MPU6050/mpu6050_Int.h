@@ -46,7 +46,7 @@
  * 1 = Complementary filter
  * 2 = Kalman filter
  */
-#define MPU6050_ANGLE_CALCULATION_ALGORITHM		1
+#define MPU6050_ANGLE_CALCULATION_ALGORITHM		2
 
 /* Weight for complementary filter */
 #define ALPHA 0.98
