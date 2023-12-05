@@ -39,6 +39,9 @@ typedef struct
 	float float_StictionSpeedThreshold;  // RPM
 	float float_FrictionValue;
 
+	Bool_t Bool_InputSaturation;
+	Bool_t Bool_FirstMeasureDone;
+
 	uint32_t uint32_LastTick;
 
 } Controller_t;
@@ -57,7 +60,9 @@ Error_t Controller_Init(Controller_t *psController,
 Error_t Controller_GetPIDVoltageValue(uint32_t uint32_CurrentTick, MPU6050_Angles_t sAngles,
 									  Controller_t *psController, float *pfloat_VoltageValue);
 
-Error_t Controller_CalculateDutyCycle(float pfloat_VoltageValue, float *pfloat_DutyCycle);
+Error_t Controller_CalculateDutyCycle(Controller_t *psController,
+								      float float_VoltageValue,
+									  float *pfloat_DutyCycle);
 
 //void set_angle_Average_Filter(float filter_value);
 //float get_angle_Average_Filter(void);

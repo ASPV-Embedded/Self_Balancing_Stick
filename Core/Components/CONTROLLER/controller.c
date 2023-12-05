@@ -60,6 +60,8 @@ Error_t Controller_Init(Controller_t *psController,
 		psController->uint32_LastTick = 0;
 		psController->float_PIDValue = 0;
 
+		psController->Bool_InputSaturation = FALSE;
+		psController->Bool_FirstMeasureDone = FALSE;
 	}
 	return Error;
 }
@@ -98,48 +100,67 @@ Error_t Controller_GetPIDVoltageValue(uint32_t uint32_CurrentTick, MPU6050_Angle
 
 	if (E_OK == Error)
 	{
-		// calculate angle error
-		float_AngleError = psController->float_AngleSetpoint - float_CurrentAngle;
-
-		// calculate DeltaT [s]
-		float_DeltaT = (float)(uint32_CurrentTick - psController->uint32_LastTick) / 1000;
-		psController->uint32_LastTick = uint32_CurrentTick;
-
-		// integral angle error
-		psController->float_AngleIntegralError += (float_AngleError * float_DeltaT);
-
-		// Integral wind-up control
-		if (psController->float_AngleIntegralError > psController->float_AngleIntegralMax)
+		if (TRUE == psController->Bool_FirstMeasureDone)
 		{
-			psController->float_AngleIntegralError = psController->float_AngleIntegralMax;
+			// calculate angle error
+			float_AngleError = psController->float_AngleSetpoint - float_CurrentAngle;
+
+			// calculate DeltaT [s]
+			float_DeltaT = (float)(uint32_CurrentTick - psController->uint32_LastTick) / 1000;
+			psController->uint32_LastTick = uint32_CurrentTick;
+
+			// limited integrator
+			if (FALSE == psController->Bool_InputSaturation)
+			{
+				// integral angle error
+				psController->float_AngleIntegralError += (float_AngleError * float_DeltaT);
+			}
+
+			// derivative angle error
+			float_AngleDerivativeError = (float_AngleError - psController->float_LastError) / float_DeltaT;
+			psController->float_LastError = float_AngleError;
+
+			// calculation of Proportional, Integral and Derivative actions
+			float float_PropValue = psController->float_Kp * float_AngleError;
+			float float_IntValue = psController->float_Ki * psController->float_AngleIntegralError;
+			float float_DerivValue = psController->float_Kd * float_AngleDerivativeError;
+			//		float S_Accel = psController->float_Ks * float_WheelSpeed;
+
+			// Integral action wind-up control
+			//		if (float_IntValue > psController->float_AngleIntegralMax)
+			//		{
+			//			float_IntValue = psController->float_AngleIntegralMax;
+			//			psController->Bool_InputSaturation = TRUE;
+			//		}
+			//		else if (float_IntValue < -psController->float_AngleIntegralMin)
+			//		{
+			//			float_IntValue = -psController->float_AngleIntegralMin;
+			//			psController->Bool_InputSaturation = TRUE;
+			//		}
+			//		else
+			//		{
+			//			psController->Bool_InputSaturation = FALSE;
+			//		}
+
+			psController->float_PIDValue = float_PropValue + float_IntValue + float_DerivValue;// + S_Accel;
+
+			//		// friction_Value is applied at low speeds
+			//		if ((float_WheelSpeed * RAD_S_TO_RPM_CONVERSION_FACTOR) > psController->float_StictionSpeedThreshold)
+			//		{
+			//			float_friction = psController->float_FrictionValue;
+			//		}
+			//		else if ((float_WheelSpeed * RAD_S_TO_RPM_CONVERSION_FACTOR) < -psController->float_StictionSpeedThreshold)
+			//		{
+			//			float_friction = -psController->float_FrictionValue;
+			//		}
+
+			*pfloat_VoltageValue = psController->float_PIDValue;
 		}
-		else if (psController->float_AngleIntegralError < psController->float_AngleIntegralMin)
+		else
 		{
-			psController->float_AngleIntegralError = psController->float_AngleIntegralMin;
+			psController->uint32_LastTick = uint32_CurrentTick;
+			psController->Bool_FirstMeasureDone = TRUE;
 		}
-
-		// derivative angle error
-		float_AngleDerivativeError = (float_AngleError - psController->float_LastError) / float_DeltaT;
-		psController->float_LastError = float_AngleError;
-
-		// calculation of Proportional, Integral and Derivative actions
-		float float_PropValue = psController->float_Kp * float_AngleError;
-		float float_IntValue = psController->float_Ki * psController->float_AngleIntegralError;
-		float float_DerivValue = psController->float_Kd * float_AngleDerivativeError;
-//		float S_Accel = psController->float_Ks * float_WheelSpeed;
-		psController->float_PIDValue = float_PropValue + float_IntValue + float_DerivValue;// + S_Accel;
-
-//		// friction_Value is applied at low speeds
-//		if ((float_WheelSpeed * RAD_S_TO_RPM_CONVERSION_FACTOR) > psController->float_StictionSpeedThreshold)
-//		{
-//			float_friction = psController->float_FrictionValue;
-//		}
-//		else if ((float_WheelSpeed * RAD_S_TO_RPM_CONVERSION_FACTOR) < -psController->float_StictionSpeedThreshold)
-//		{
-//			float_friction = -psController->float_FrictionValue;
-//		}
-
-		*pfloat_VoltageValue = psController->float_PIDValue;
 	}
 
 	return Error;
@@ -147,10 +168,13 @@ Error_t Controller_GetPIDVoltageValue(uint32_t uint32_CurrentTick, MPU6050_Angle
 
 /*
  * @brief calculate duty cycle value normalizing PID output to the max voltage applicable on the motor
+ * @param psController - Controller structure
  * @param float_VoltageValue- PID Output
  * @param pfloat_DutyCycle - Duty Cycle value (between -1.0 and 1.0)
  */
-Error_t Controller_CalculateDutyCycle(float float_VoltageValue, float *pfloat_DutyCycle)
+Error_t Controller_CalculateDutyCycle(Controller_t *psController,
+								      float float_VoltageValue,
+									  float *pfloat_DutyCycle)
 {
 	Error_t Error = E_OK;
 	float float_NormalizedValue = 0;
@@ -165,14 +189,16 @@ Error_t Controller_CalculateDutyCycle(float float_VoltageValue, float *pfloat_Du
 		if (float_VoltageValue < -MOTOR_VMAX)
 		{
 			float_VoltageValue = -MOTOR_VMAX;
+			psController->Bool_InputSaturation = TRUE;
 		}
 		else if(float_VoltageValue > MOTOR_VMAX)
 		{
 			float_VoltageValue = MOTOR_VMAX;
+			psController->Bool_InputSaturation = TRUE;
 		}
 		else
 		{
-			/* Nothing to be done */
+			psController->Bool_InputSaturation = FALSE;
 		}
 
 		/* Normalize Voltage value [-1 ; 1] */
