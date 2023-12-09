@@ -46,7 +46,7 @@
  * 1 = Complementary filter
  * 2 = Kalman filter
  */
-#define MPU6050_ANGLE_CALCULATION_ALGORITHM		2
+#define MPU6050_ANGLE_CALCULATION_ALGORITHM		1
 
 /* Weight for complementary filter */
 #define ALPHA 0.98
@@ -84,6 +84,8 @@ I2C_HandleTypeDef *_pI2C_handle;
 
 uint8_t _vMPU6050_RxBuffer[14];
 MPU6050_Data_t _sMPU6050_Data;
+
+Bool_t _Bool_FirstMeasureDone = FALSE;
 
 /* For i2c read operation */
 volatile Bool_t _BOOL_MPU6050_ReadReqDone = FALSE;

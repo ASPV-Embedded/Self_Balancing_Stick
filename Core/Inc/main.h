@@ -105,25 +105,27 @@ typedef char Bool_t;
 #define FALSE		(Bool_t)0
 #define TRUE		(Bool_t)1
 
-#define Error_Check(Error, Function)	\
-		{								\
-			if (E_OK == Error)			\
-			{							\
-				Error = Function;		\
-			}							\
-		}
+#define Error_Check(Error, Function) \
+{									 \
+	if (E_OK == Error)				 \
+	{								 \
+		Error = Function;			 \
+	}								 \
+}
 
-#define SGN(value, sign) 		\
-		{  						\
-			if (value > 0)      \
-			{                   \
-				sign = 1;       \
-			}                   \
-			else                \
-			{                   \
-				sign = -1;      \
-			}                   \
-		}
+#define SGN(value) 		\
+({  					\
+	int8_t sign = 0;    \
+	if (value > 0)      \
+	{                   \
+		sign = 1;       \
+	}                   \
+	else                \
+	{                   \
+		sign = -1;      \
+	}                   \
+	sign;				\
+})
 
 /* USER CODE END Private defines */
 

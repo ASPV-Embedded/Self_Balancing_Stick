@@ -120,7 +120,6 @@ int main(void)
   SystemClock_Config();
 
   /* USER CODE BEGIN SysInit */
-  HAL_Delay (1000);
   memset(&hi2c2, 0x0, sizeof(hi2c2));
   /* USER CODE END SysInit */
 

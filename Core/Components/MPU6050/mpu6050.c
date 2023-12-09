@@ -186,50 +186,46 @@ void MPU6050_Get_Angles(MPU6050_Angles_t *pAngles)
 			/* Update timer */
 			_uint32_LastAngleCalc = HAL_GetTick();
 
-			// https://www.nxp.com/docs/en/application-note/AN3461.pdf
-			float_Roll = (atan2(_sMPU6050_Data.Ay, _sMPU6050_Data.Az) * RAD_TO_DEG);
-			SGN(float_Roll, int8_RollSgn);
+			if (TRUE == _Bool_FirstMeasureDone)
+			{
+				// https://www.nxp.com/docs/en/application-note/AN3461.pdf
+				float_Roll = (atan2(_sMPU6050_Data.Ay, _sMPU6050_Data.Az) * RAD_TO_DEG);
+				int8_RollSgn = SGN(float_Roll);
 
-			float_Roll = float_Roll - (int8_RollSgn * 180);
+				float_Roll = float_Roll - (int8_RollSgn * 180);
 
-			float_PitchSqrt = sqrt(_sMPU6050_Data.Ay * _sMPU6050_Data.Ay + _sMPU6050_Data.Az * _sMPU6050_Data.Az);
-			float_Pitch = atan2(-_sMPU6050_Data.Ax, float_PitchSqrt) * RAD_TO_DEG;
+				float_PitchSqrt = sqrt(_sMPU6050_Data.Ay * _sMPU6050_Data.Ay + _sMPU6050_Data.Az * _sMPU6050_Data.Az);
+				float_Pitch = atan2(-_sMPU6050_Data.Ax, float_PitchSqrt) * RAD_TO_DEG;
 
 #if (MPU6050_ANGLE_CALCULATION_ALGORITHM == 0) // Only accelerometer data
 
-			pAngles->AngleX = float_Roll;
-			pAngles->AngleY = float_Pitch;
+				pAngles->AngleX = float_Roll;
+				pAngles->AngleY = float_Pitch;
 
 #elif (MPU6050_ANGLE_CALCULATION_ALGORITHM == 1) // Complementary filter
 
-			float float_RollRate, float_PitchRate, float_PitchRateSqrt = 0;
-			int8_t int8_RollRateSgn;
-
-			float_RollRate = (atan2(_sMPU6050_Data.Gy, _sMPU6050_Data.Gz) * RAD_TO_DEG);
-			SGN(float_RollRate, int8_RollRateSgn);
-
-			float_RollRate = float_RollRate - (int8_RollRateSgn * 180);
-
-			float_PitchRateSqrt = sqrt(_sMPU6050_Data.Gy * _sMPU6050_Data.Gy + _sMPU6050_Data.Gz * _sMPU6050_Data.Gz);
-			float_PitchRate = atan2(-_sMPU6050_Data.Gx, float_PitchRateSqrt) * RAD_TO_DEG;
-
-			pAngles->AngleX = (ALPHA)*(pAngles->AngleX + float_RollRate*float_DeltaT) + (1 - ALPHA)*float_Roll;
-			pAngles->AngleY = (ALPHA)*(pAngles->AngleY + float_PitchRate*float_DeltaT) + (1 - ALPHA)*float_Pitch;
+				pAngles->AngleX = (ALPHA)*(pAngles->AngleX + _sMPU6050_Data.Gx*float_DeltaT) + (1 - ALPHA)*float_Roll;
+				pAngles->AngleY = (ALPHA)*(pAngles->AngleY + _sMPU6050_Data.Gy*float_DeltaT) + (1 - ALPHA)*float_Pitch;
 
 #elif (MPU6050_ANGLE_CALCULATION_ALGORITHM == 2) // Kalman filter
-			_sMPU6050_Data.KalmanAngleX = MPU6050_Kalman_CalculateAngle(&_KalmanX, float_Roll, _sMPU6050_Data.Gx, float_DeltaT);
-			_sMPU6050_Data.KalmanAngleY = MPU6050_Kalman_CalculateAngle(&_KalmanY, float_Pitch, _sMPU6050_Data.Gy, float_DeltaT);
+				_sMPU6050_Data.KalmanAngleX = MPU6050_Kalman_CalculateAngle(&_KalmanX, float_Roll, _sMPU6050_Data.Gx, float_DeltaT);
+				_sMPU6050_Data.KalmanAngleY = MPU6050_Kalman_CalculateAngle(&_KalmanY, float_Pitch, _sMPU6050_Data.Gy, float_DeltaT);
 
-			pAngles->AngleX = _sMPU6050_Data.KalmanAngleX;
-			pAngles->AngleY = _sMPU6050_Data.KalmanAngleY;
+				pAngles->AngleX = _sMPU6050_Data.KalmanAngleX;
+				pAngles->AngleY = _sMPU6050_Data.KalmanAngleY;
 #endif
 
-			_sAngles.AngleX = pAngles->AngleX;
-			_sAngles.AngleY = pAngles->AngleY;
+				_sAngles.AngleX = pAngles->AngleX;
+				_sAngles.AngleY = pAngles->AngleY;
 
-			/* Reset "state machine" variables */
-			_BOOL_MPU6050_ReadReqDone = FALSE;
-			_BOOL_MPU6050_NewDataReceived = FALSE;
+				/* Reset "state machine" variables */
+				_BOOL_MPU6050_ReadReqDone = FALSE;
+				_BOOL_MPU6050_NewDataReceived = FALSE;
+			}
+			else
+			{
+				_Bool_FirstMeasureDone = TRUE;
+			}
 		}
 	}
 }
