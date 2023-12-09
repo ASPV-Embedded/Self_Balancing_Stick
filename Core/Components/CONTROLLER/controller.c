@@ -109,6 +109,13 @@ Error_t Controller_GetPIDVoltageValue(uint32_t uint32_CurrentTick, MPU6050_Angle
 			float_DeltaT = (float)(uint32_CurrentTick - psController->uint32_LastTick) / 1000;
 			psController->uint32_LastTick = uint32_CurrentTick;
 
+			/* check if error has changed sign; if yes this means the set point has been reached and that
+			   input is no more saturating */
+			if (SGN(float_AngleError) != SGN(psController->float_LastError))
+			{
+				psController->Bool_InputSaturation = FALSE;
+			}
+
 			// limited integrator
 			if (FALSE == psController->Bool_InputSaturation)
 			{
@@ -195,10 +202,6 @@ Error_t Controller_CalculateDutyCycle(Controller_t *psController,
 		{
 			float_VoltageValue = MOTOR_VMAX;
 			psController->Bool_InputSaturation = TRUE;
-		}
-		else
-		{
-			psController->Bool_InputSaturation = FALSE;
 		}
 
 		/* Normalize Voltage value [-1 ; 1] */
