@@ -28,16 +28,10 @@ typedef struct
 	float float_Kp;
 	float float_Ki;
 	float float_Kd;
-	float float_Ks;
 
 	float float_AngleSetpoint;
 	float float_AngleIntegralError;
 	float float_LastError;
-	float float_AngleIntegralMax;
-	float float_AngleIntegralMin;
-
-	float float_StictionSpeedThreshold;  // RPM
-	float float_FrictionValue;
 
 	Bool_t Bool_InputSaturation;
 	Bool_t Bool_FirstMeasureDone;
@@ -51,11 +45,7 @@ Error_t Controller_Init(Controller_t *psController,
 						float float_AngleSetpoint,
 						float float_Kp,
 						float float_Ki,
-						float float_Kd,
-						float float_Ks,
-						float float_Friction,
-						float float_angle_Integral_Max,
-						float float_angle_Integral_Min);
+						float float_Kd);
 
 Error_t Controller_GetPIDVoltageValue(uint32_t uint32_CurrentTick, MPU6050_Angles_t sAngles,
 									  Controller_t *psController, float *pfloat_VoltageValue);

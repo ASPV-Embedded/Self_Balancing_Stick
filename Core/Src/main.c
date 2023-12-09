@@ -180,24 +180,17 @@ int main(void)
   Error_Check(Error, Controller_Init(&_sControllerX,	//controller instance
 		  	  	  	  	  	  	  	 CONTROLLER_AXIS_X, // direction
 									 0,					// set point
-									 100,				// Kp
+									 200,				// Kp
 									 2,                	// Ki
-									 0,					// Kd
-									 1,					// Ks (not used)
-									 0,					// friction (not used)
-									 100,				// max positive value of Integral action (wind up prevention)
-									 -100));			// max negative value of Integral action (wind up prevention)
+									 0));  				// Kd
+
 
   Error_Check(Error, Controller_Init(&_sControllerY,	//controller instance
 		  	  	  	  	  	  	  	 CONTROLLER_AXIS_Y,	// direction
 									 0,					// set point
-									 100,				// Kp
+									 200,				// Kp
 									 2,					// Ki
-									 0,					// Kd
-									 1,					// Ks (not used)
-									 0,					// friction (not used)
-									 100,				// max positive value of Integral action (wind up prevention)
-									 -100));			// max negative value of Integral action (wind up prevention)
+									 0));  				// Kd
 
   /* OLED display initialization */
   Display_Init(&_sControllerX, &_sControllerY);

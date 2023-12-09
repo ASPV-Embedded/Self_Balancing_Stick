@@ -41,12 +41,9 @@ void Display_DrawOutline()
 
 	  ssd1306_SetCursor(66, 24);
 	  ssd1306_WriteString("Ki=", Font_7x10, White);
-
-	  ssd1306_SetCursor(66, 48);
-	  ssd1306_WriteString("Ks=", Font_7x10, White);
 }
 
-void Display_WritePidGains(float float_Kp, float float_Ki, float float_Kd, float float_Ks)
+void Display_WritePidGains(float float_Kp, float float_Ki, float float_Kd)
 {
 	char str[5] = {0};
 	sprintf(str, "%.1f", float_Kp);
@@ -61,11 +58,6 @@ void Display_WritePidGains(float float_Kp, float float_Ki, float float_Kd, float
 	memset(str, 0x0, sizeof(str));
 	sprintf(str, "%.1f", float_Kd);
 	ssd1306_SetCursor(24, 48);
-	ssd1306_WriteString(str, Font_7x10, White);
-
-	memset(str, 0x0, sizeof(str));
-	sprintf(str, "%.1f", float_Ks);
-	ssd1306_SetCursor(87, 48);
 	ssd1306_WriteString(str, Font_7x10, White);
 
 }
@@ -112,10 +104,6 @@ void Display_UnderlineElement(Display_Element_te Enum_ElementToUnderline, SSD130
 		ssd1306_Line(3, 58, 16, 58, Enum_Color);
 		break;
 
-	case Display_Element_Ks:
-		ssd1306_Line(66, 58, 79, 58, Enum_Color);
-		break;
-
 	default:
 		break;
 	}
@@ -132,15 +120,13 @@ void Display_UpdateScreen()
 	case Display_Element_1:
 		Display_WritePidGains(_Display_Context.psControllerX->float_Kp,
 							  _Display_Context.psControllerX->float_Ki,
-							  _Display_Context.psControllerX->float_Kd,
-							  _Display_Context.psControllerX->float_Ks);
+							  _Display_Context.psControllerX->float_Kd);
 		break;
 
 	case Display_Element_2:
 		Display_WritePidGains(_Display_Context.psControllerY->float_Kp,
 							  _Display_Context.psControllerY->float_Ki,
-							  _Display_Context.psControllerY->float_Kd,
-							  _Display_Context.psControllerY->float_Ks);
+							  _Display_Context.psControllerY->float_Kd);
 		break;
 
 	default:

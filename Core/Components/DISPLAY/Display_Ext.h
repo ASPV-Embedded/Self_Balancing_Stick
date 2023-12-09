@@ -37,8 +37,7 @@ typedef enum
 	Display_Element_Kp = Display_Element_FirstPidCoeffValue,
 	Display_Element_Ki = 3,
 	Display_Element_Kd = 4,
-	Display_Element_Ks = 5,
-	Display_Element_LastPidCoeffValue = Display_Element_Ks,
+	Display_Element_LastPidCoeffValue = Display_Element_Kd,
 
 	Display_Element_Invalid
 }Display_Element_te;

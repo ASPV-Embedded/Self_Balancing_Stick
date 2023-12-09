@@ -17,10 +17,6 @@
  * @param float_Kp - PID imu proportional gain
  * @param float_Ki - PID imu integral gain
  * @param float_Kd - PID imu derivative gain
- * @param float_Ks - PID rotor speed gain
- * @param float_Friction
- * @param float_angle_Integral_Max - Max value of integral error
- * @param float_angle_Integral_Min - Min value of integral error
  *
  */
 Error_t Controller_Init(Controller_t *psController,
@@ -28,11 +24,7 @@ Error_t Controller_Init(Controller_t *psController,
 						float float_AngleSetpoint,
 						float float_Kp,
 						float float_Ki,
-						float float_Kd,
-						float float_Ks,
-						float float_Friction,
-						float float_angle_Integral_Max,
-						float float_angle_Integral_Min)
+						float float_Kd)
 {
 	Error_t Error = E_OK;
 
@@ -48,12 +40,6 @@ Error_t Controller_Init(Controller_t *psController,
 		psController->float_Kp = float_Kp;
 		psController->float_Ki = float_Ki;
 		psController->float_Kd = float_Kd;
-		psController->float_Ks = float_Ks;
-
-		psController->float_FrictionValue = float_Friction;
-
-		psController->float_AngleIntegralMax = float_angle_Integral_Max;
-		psController->float_AngleIntegralMin = float_angle_Integral_Min;
 
 		psController->float_AngleIntegralError = 0;
 		psController->float_LastError = 0;
@@ -81,7 +67,6 @@ Error_t Controller_GetPIDVoltageValue(uint32_t uint32_CurrentTick, MPU6050_Angle
 	float float_AngleDerivativeError = 0;
 	float float_DeltaT = 0;
 	float float_WheelSpeed = 0;
-//	float float_friction = 0;
 
 	if (CONTROLLER_AXIS_X == psController->Enum_ControllerAxis)
 	{
@@ -110,7 +95,7 @@ Error_t Controller_GetPIDVoltageValue(uint32_t uint32_CurrentTick, MPU6050_Angle
 			psController->uint32_LastTick = uint32_CurrentTick;
 
 			/* check if error has changed sign; if yes this means the set point has been reached and that
-			   input is no more saturating */
+			   input is no more saturating (anti wind-up) */
 			if (SGN(float_AngleError) != SGN(psController->float_LastError))
 			{
 				psController->Bool_InputSaturation = FALSE;
@@ -131,35 +116,8 @@ Error_t Controller_GetPIDVoltageValue(uint32_t uint32_CurrentTick, MPU6050_Angle
 			float float_PropValue = psController->float_Kp * float_AngleError;
 			float float_IntValue = psController->float_Ki * psController->float_AngleIntegralError;
 			float float_DerivValue = psController->float_Kd * float_AngleDerivativeError;
-			//		float S_Accel = psController->float_Ks * float_WheelSpeed;
 
-			// Integral action wind-up control
-			//		if (float_IntValue > psController->float_AngleIntegralMax)
-			//		{
-			//			float_IntValue = psController->float_AngleIntegralMax;
-			//			psController->Bool_InputSaturation = TRUE;
-			//		}
-			//		else if (float_IntValue < -psController->float_AngleIntegralMin)
-			//		{
-			//			float_IntValue = -psController->float_AngleIntegralMin;
-			//			psController->Bool_InputSaturation = TRUE;
-			//		}
-			//		else
-			//		{
-			//			psController->Bool_InputSaturation = FALSE;
-			//		}
-
-			psController->float_PIDValue = float_PropValue + float_IntValue + float_DerivValue;// + S_Accel;
-
-			//		// friction_Value is applied at low speeds
-			//		if ((float_WheelSpeed * RAD_S_TO_RPM_CONVERSION_FACTOR) > psController->float_StictionSpeedThreshold)
-			//		{
-			//			float_friction = psController->float_FrictionValue;
-			//		}
-			//		else if ((float_WheelSpeed * RAD_S_TO_RPM_CONVERSION_FACTOR) < -psController->float_StictionSpeedThreshold)
-			//		{
-			//			float_friction = -psController->float_FrictionValue;
-			//		}
+			psController->float_PIDValue = float_PropValue + float_IntValue + float_DerivValue;
 
 			*pfloat_VoltageValue = psController->float_PIDValue;
 		}

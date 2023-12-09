@@ -55,10 +55,6 @@ void Remote_Cmd_OnCmdReceived(uint8_t uint8_Cmd)
 		{
 			Display_SelectCoeff(Display_Element_Kp);
 		}
-		else if(Display_GetSelectedCoeff() == Display_Element_Ks)
-		{
-			Display_SelectCoeff(Display_Element_Ki);
-		}
 		break;
 
 	case 0x44:
@@ -66,10 +62,6 @@ void Remote_Cmd_OnCmdReceived(uint8_t uint8_Cmd)
 		if(Display_GetSelectedCoeff() == Display_Element_Ki)
 		{
 			Display_SelectCoeff(Display_Element_Kp);
-		}
-		else if(Display_GetSelectedCoeff() == Display_Element_Ks)
-		{
-			Display_SelectCoeff(Display_Element_Kd);
 		}
 		break;
 
@@ -91,10 +83,6 @@ void Remote_Cmd_OnCmdReceived(uint8_t uint8_Cmd)
 		{
 			Display_SelectCoeff(Display_Element_Ki);
 		}
-		else if(Display_GetSelectedCoeff() == Display_Element_Kd)
-		{
-			Display_SelectCoeff(Display_Element_Ks);
-		}
 		break;
 
 	case 0x07:
@@ -106,10 +94,6 @@ void Remote_Cmd_OnCmdReceived(uint8_t uint8_Cmd)
 		if(Display_GetSelectedCoeff() == Display_Element_Kp)
 		{
 			Display_SelectCoeff(Display_Element_Kd);
-		}
-		else if(Display_GetSelectedCoeff() == Display_Element_Ki)
-		{
-			Display_SelectCoeff(Display_Element_Ks);
 		}
 		break;
 

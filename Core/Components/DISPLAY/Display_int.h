@@ -19,7 +19,7 @@ Display_Element_te _Enum_SelectedController = Display_Element_1;
 Display_Context_ts _Display_Context = {0};
 
 void Display_DrawOutline();
-void Display_WritePidGains(float float_Kp, float float_Ki, float float_Kd, float float_Ks);
+void Display_WritePidGains(float float_Kp, float float_Ki, float float_Kd);
 void Display_UnderlineElement(Display_Element_te Enum_ElementToUnderline, SSD1306_COLOR Enum_Color);
 
 #endif /* INC_DISPLAY_INT_H_ */
