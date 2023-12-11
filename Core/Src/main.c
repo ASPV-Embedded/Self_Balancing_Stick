@@ -105,6 +105,9 @@ int main(void)
   /* USER CODE BEGIN 1 */
   Error_t Error = E_OK;
   Motor_BrakeState_te Enum_BrakeState = BRAKE_ON;
+
+  /* 2x3 matrix */
+  float* vRemoteCmdItemPointer[Display_Element_LastControllerValue][Display_Element_LastPidCoeffValue - Display_Element_LastControllerValue];
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -196,7 +199,14 @@ int main(void)
   Display_Init(&_sControllerX, &_sControllerY);
 
   /* Remote command module initialization */
-  Remote_Cmd_Init(&_sMotorBrake, &_Bool_IsControlLoopEnabled);
+  vRemoteCmdItemPointer[Display_Element_1][Display_Element_Kp - Display_Element_FirstPidCoeffValue] = &_sControllerX.float_Kp;
+  vRemoteCmdItemPointer[Display_Element_1][Display_Element_Ki - Display_Element_FirstPidCoeffValue] = &_sControllerX.float_Ki;
+  vRemoteCmdItemPointer[Display_Element_1][Display_Element_Kd - Display_Element_FirstPidCoeffValue] = &_sControllerX.float_Kd;
+
+  vRemoteCmdItemPointer[Display_Element_2][Display_Element_Kp - Display_Element_FirstPidCoeffValue] = &_sControllerY.float_Kp;
+  vRemoteCmdItemPointer[Display_Element_2][Display_Element_Ki - Display_Element_FirstPidCoeffValue] = &_sControllerY.float_Ki;
+  vRemoteCmdItemPointer[Display_Element_2][Display_Element_Kd - Display_Element_FirstPidCoeffValue] = &_sControllerY.float_Kd;
+  Remote_Cmd_Init(&_sMotorBrake, &_Bool_IsControlLoopEnabled, vRemoteCmdItemPointer);
 
   /* USER CODE END 2 */
 
@@ -276,6 +286,8 @@ void SystemClock_Config(void)
 void Main_ControlLoop()
 {
 	_xRoutineStartTick = HAL_GetTick();
+
+	Display_UpdateScreen();
 
 	if (_Bool_IsControlLoopEnabled == TRUE)
 	{

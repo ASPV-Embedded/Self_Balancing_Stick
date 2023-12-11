@@ -10,6 +10,6 @@
 
 #include "MotorExt.h"
 
-void Remote_Cmd_Init(Motor_Brake_t *psMotorBrake, Bool_t *pBool_IsControlLoopEnabled);
+void Remote_Cmd_Init(Motor_Brake_t *psMotorBrake, Bool_t *pBool_IsControlLoopEnabled, float* vEntityItemPointer[][3]);
 
 #endif /* COMPONENTS_REMOTE_CMD_REMOTE_CMD_EXT_H_ */
