@@ -22,6 +22,7 @@
 #include "dma.h"
 #include "i2c.h"
 #include "tim.h"
+#include "usart.h"
 #include "gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
@@ -35,6 +36,7 @@
 #include "Display_Ext.h"
 #include "ssd1306.h"
 #include "eeprom.h"
+#include "stdio.h"
 
 /* USER CODE END Includes */
 
@@ -81,6 +83,9 @@ Motor_Brake_t _sMotorBrake;
 Bool_t _Bool_IsControlLoopEnabled = FALSE;
 
 MPU6050_Angles_t _sMain_Angles = {0};
+
+char _Char_TerminalBuff[50];
+
 
 /* USER CODE END PV */
 
@@ -139,19 +144,20 @@ int main(void)
   MX_TIM8_Init();
   MX_TIM11_Init();
   MX_TIM12_Init();
+  MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
-
-  /* Start encoder timer and clear any interrupt */
-  __HAL_TIM_CLEAR_IT(&htim3, TIM_IT_UPDATE);
-  __HAL_TIM_CLEAR_IT(&htim4, TIM_IT_UPDATE);
-  HAL_TIM_Base_Start_IT(&htim3);
-  HAL_TIM_Base_Start_IT(&htim4);
 
   /* IMU initialization */
   while (MPU6050_Init(&hi2c2) == 1)
   {
 	  HAL_Delay (100);
   }
+
+  /* Start encoder timer and clear any interrupt */
+  __HAL_TIM_CLEAR_IT(&htim3, TIM_IT_UPDATE);
+  __HAL_TIM_CLEAR_IT(&htim4, TIM_IT_UPDATE);
+  HAL_TIM_Base_Start_IT(&htim3);
+  HAL_TIM_Base_Start_IT(&htim4);
 
   /* Start IMU sample loop timer */
   HAL_TIM_Base_Start_IT(&htim11);
@@ -317,6 +323,10 @@ void Main_ControlLoop()
 		_xRoutineEndTick = HAL_GetTick();
 		_xRoutineElapsedTime = _xRoutineEndTick - _xRoutineStartTick;
 	}
+
+	uint16_t uint16_size = 0;
+	uint16_size = sprintf(_Char_TerminalBuff, "%lu,%f,%f \r\n", _xRoutineStartTick, _sMain_Angles.AngleX, _sMain_Angles.AngleY);
+	HAL_UART_Transmit_IT(&huart2, (uint8_t*)_Char_TerminalBuff, uint16_size);
 }
 
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)

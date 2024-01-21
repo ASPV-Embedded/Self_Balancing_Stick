@@ -95,6 +95,7 @@ void Error_Handler(void);
 #define ENC_Y_B_GPIO_Port GPIOB
 #define BUZ_PWM_Pin GPIO_PIN_8
 #define BUZ_PWM_GPIO_Port GPIOB
+
 /* USER CODE BEGIN Private defines */
 
 typedef char Error_t;
