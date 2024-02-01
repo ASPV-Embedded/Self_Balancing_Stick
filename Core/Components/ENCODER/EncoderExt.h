@@ -20,7 +20,7 @@ typedef struct
 	float float_LastSpeed;
 	uint32_t xLastTick;
 	uint16_t uint16_LastCnt;
-	Bool_t Bool_IsValueToBeDiscarded;
+	Bool_t Bool_OnTimerCntReset;
 } Encoder_Handle_TypeDef;
 
 typedef enum

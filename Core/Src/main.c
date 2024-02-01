@@ -94,6 +94,7 @@ void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim);
 void Main_ControlLoop();
+void Main_DisplayUpdateLoop();
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -145,6 +146,7 @@ int main(void)
   MX_TIM11_Init();
   MX_TIM12_Init();
   MX_USART2_UART_Init();
+  MX_TIM13_Init();
   /* USER CODE BEGIN 2 */
 
   /* IMU initialization */
@@ -227,6 +229,9 @@ int main(void)
   /* Toggle brake ON */
   Motor_SetBrake(&_sMotorBrake, Enum_BrakeState);
 
+  /* Start Display Update loop timer */
+  HAL_TIM_Base_Start_IT(&htim13);
+
   /* Start Control loop timer */
   HAL_TIM_Base_Start_IT(&htim12);
 
@@ -293,7 +298,6 @@ void Main_ControlLoop()
 {
 	_xRoutineStartTick = HAL_GetTick();
 
-	Display_UpdateScreen();
 
 	if (_Bool_IsControlLoopEnabled == TRUE)
 	{
@@ -303,9 +307,6 @@ void Main_ControlLoop()
 
 		/* Calculation of set point, need to be hard-coded manually after calibration */
 		//	  MPU6050_CalculateSetPoint();
-
-		/* Periodic update of OLED display to show updated info */
-		//	  Display_UpdateScreen();
 
 		/* Controller_X routine */
 		Controller_GetPIDVoltageValue(_xRoutineStartTick, _sMain_Angles, &_sControllerX, &_float_VoltageValueX);
@@ -324,9 +325,15 @@ void Main_ControlLoop()
 		_xRoutineElapsedTime = _xRoutineEndTick - _xRoutineStartTick;
 	}
 
-	uint16_t uint16_size = 0;
-	uint16_size = sprintf(_Char_TerminalBuff, "%lu,%f,%f \r\n", _xRoutineStartTick, _sMain_Angles.AngleX, _sMain_Angles.AngleY);
-	HAL_UART_Transmit_IT(&huart2, (uint8_t*)_Char_TerminalBuff, uint16_size);
+//	uint16_t uint16_size = 0;
+//	uint16_size = sprintf(_Char_TerminalBuff, "%lu,%f,%f \r\n", _xRoutineStartTick, _sMain_Angles.AngleX, _sMain_Angles.AngleY);
+//	HAL_UART_Transmit_IT(&huart2, (uint8_t*)_Char_TerminalBuff, uint16_size);
+}
+
+void Main_DisplayUpdateLoop()
+{
+	/* Periodic update of OLED display to show updated info */
+	Display_UpdateScreen();
 }
 
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
@@ -344,6 +351,10 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 	else if (htim == &htim12)
 	{
 		Main_ControlLoop();
+	}
+	else if (htim == &htim13)
+	{
+		Main_DisplayUpdateLoop();
 	}
 }
 /* USER CODE END 4 */
